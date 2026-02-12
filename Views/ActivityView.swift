@@ -1,60 +1,45 @@
-import SwiftUI
+//
+//  ActivityView.swift
+//  SQL Activity
+//
+//  Created by Rishi Jansari on 12/02/2026.
+//
+
 import Flow
+import SwiftUI
 
-struct Block: Equatable, Hashable, Identifiable {
-    let id = UUID()
-    let content: String
-    var isUsed = false
-}
-
-struct ContentView: View {
-    var body: some View {
-        NavigationStack {
-            VStack {
-                ActivityView(
-                    question: "Write an SQL query to select all fields from the table Animals, for the animals older than 2 years.",
-                    answer: "SELECT * FROM Animals WHERE age > 2",
-                    onCorrectAnswer: {
-                        print("done")
-                    },
-                    blocks: ["SELECT", "FROM", "WHERE", "*", "Name", "City", "Dogs", "Animals", "Pets", "age", "height", "2", "1.7", "3", "5", "<", ">", "="],
-                )
-            }
-            .navigationTitle("Activity 1")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationSubtitle("Basic SQL Queries")
-        }
-    }
+enum ActivityRoute {
+    case next
+    case home
 }
 
 struct ActivityView: View {
-    let question: String
-    let answer: String
-    let onCorrectAnswer: () -> ()
+    let lesson: Lesson
+    let onFinish: (ActivityRoute) -> Void
     
     let initialBlocks: [Block]
     @State private var allBlocks: [Block]
     @State private var usedBlocks: [Block] = []
     
-    init(question: String, answer: String, onCorrectAnswer: @escaping () -> Void, blocks: [String]) {
-        self.question = question
-        self.answer = answer
-        self.onCorrectAnswer = onCorrectAnswer
+    init(lesson: Lesson, onFinish: @escaping (ActivityRoute) -> Void) {
+        self.lesson = lesson
+        self.onFinish = onFinish
         
-        let newBlocks = blocks.map {
+        let newBlocks = lesson.blocks.map {
             Block(content: $0)
         }
         initialBlocks = newBlocks
         _allBlocks = State(initialValue: newBlocks)
     }
     
-    @State private var isShowingAlert = false
-    @State private var alertMessage = ""
+    @State private var isShowingHint = false
+    @State private var isShowingResult = false
+    @State private var resultMessage = ""
     @State private var wasCorrect = false
     
     var body: some View {
         VStack {
-            Text(question)
+            Text(lesson.question)
                 .font(.title)
                 .padding()
             
@@ -136,10 +121,20 @@ struct ActivityView: View {
             
             Spacer()
         }
+        .navigationTitle(lesson.title)
+        .navigationSubtitle(lesson.subtitle ?? "")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .destructiveAction) {
-                Button("Clear", systemImage: "arrow.trianglehead.counterclockwise", action: clearUserAnswer)
+                Button("Retry", systemImage: "arrow.trianglehead.counterclockwise", action: clearUserAnswer)
                     .tint(.red)
+            }
+            if lesson.hint != nil {
+                ToolbarSpacer(placement: .primaryAction)
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
+                        .tint(.yellow)
+                }
             }
             ToolbarItem(placement: .bottomBar) {
                 Button("Submit", role: .confirm, action: verifyAnswer)
@@ -149,32 +144,19 @@ struct ActivityView: View {
                     .tint(.blue)
             }
         }
-        
-        .alert(alertMessage, isPresented: $isShowingAlert) {
+        .alert(lesson.hint ?? "", isPresented: $isShowingHint) {}
+        .alert(resultMessage, isPresented: $isShowingResult) {
             if wasCorrect {
-                // Title needs to be dynamic based on whether end of kesson
-                Button("Next Activity", role: .confirm) { onCorrectAnswer() }
+                Button("Home", role: .cancel) { onFinish(.home) }
+                Button("Next Activity", role: .confirm) { onFinish(.next) }
             } else {
                 Button("Try Again", role: .close) {}
             }
         }
     }
     
-    private func drawBlock(title: String, color: Color, action: @escaping () -> Void) -> some View {
-        Button(title, action: action)
-            .buttonStyle(GlassBlockButtonStyle(color: color))
-    }
-    
-    private func verifyAnswer() {
-        let userAnswer = usedBlocks.map(\.content).joined(separator: " ")
-        
-        if userAnswer == answer {
-            wasCorrect = true
-            alertMessage = "Correct!"
-        } else {
-            alertMessage = "Incorrect."
-        }
-        isShowingAlert = true
+    private func showHint() {
+        isShowingHint = true
     }
     
     private func clearUserAnswer() {
@@ -184,17 +166,16 @@ struct ActivityView: View {
             usedBlocks = []
         }
     }
-}
-
-struct GlassBlockButtonStyle: ButtonStyle {
-    var color: Color
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.title)
-            .padding()
-            .foregroundStyle(.black)
-            .frame(minWidth: 100)
-            .glassEffect(.regular.interactive().tint(color))
+    
+    private func verifyAnswer() {
+        let userAnswer = usedBlocks.map(\.content).joined(separator: " ")
+        
+        if userAnswer == lesson.answer {
+            wasCorrect = true
+            resultMessage = "Correct!"
+        } else {
+            resultMessage = "Incorrect."
+        }
+        isShowingResult = true
     }
 }
