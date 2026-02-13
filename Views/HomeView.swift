@@ -33,8 +33,8 @@ struct HomeView: View {
             .navigationTitle("Lessons")
             .navigationDestination(for: Lesson.self) { lesson in
                 if let idx = lessons.firstIndex(where: { $0.id == lesson.id }) {
-                    LessonView(lesson: $lessons[idx]) {// route in
-                        handleFinish(for: lessons[idx]/*, route: route*/)
+                    LessonView(lesson: $lessons[idx]) { success in // route in
+                        handleFinish(for: lessons[idx], success: success/*, route: route*/)
                     }
                     .id(lesson.id)
                 } else {
@@ -44,9 +44,9 @@ struct HomeView: View {
         }
     }
     
-    private func handleFinish(for lesson: Lesson/*, route: ActivityRoute*/) {
+    private func handleFinish(for lesson: Lesson, success: Bool/*, route: ActivityRoute*/) {
         guard let currentIndex = lessons.firstIndex(where: { $0.id == lesson.id }) else { return }
-        lessons[currentIndex].isComplete = true
+        lessons[currentIndex].isComplete = success
         path = NavigationPath()
 //
 //        switch route {

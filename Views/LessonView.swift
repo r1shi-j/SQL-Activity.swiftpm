@@ -14,13 +14,14 @@ import SwiftUI
 
 struct LessonView: View {
     @Binding var lesson: Lesson
-    let onFinish: (/*ActivityRoute*/) -> Void
+    let goHome: (Bool/*ActivityRoute*/) -> Void
     
     @State private var currentIndex = 0
+    @State private var isShowingExitConfirmation = false
     
-    init(lesson: Binding<Lesson>, onFinish: @escaping (/*ActivityRoute*/) -> Void) {
+    init(lesson: Binding<Lesson>, goHome: @escaping (Bool/*ActivityRoute*/) -> Void) {
         _lesson = lesson
-        self.onFinish = onFinish
+        self.goHome = goHome
     }
     
     var body: some View {
@@ -59,13 +60,25 @@ struct LessonView: View {
         .navigationTitle(lesson.title)
         .navigationSubtitle(lesson.subtitle ?? "")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button("Back", systemImage: "chevron.left", action: toggleExitConfirmation)
+            }
+        }
+        .alert("Are you sure you want you want to exit this lesson?", isPresented: $isShowingExitConfirmation) {
+            Button("No", role: .cancel) {}
+            Button("Yes", role: .destructive) { goHome(false) }
+        } message: {
+            Text("Your progress will be lost.")
+        }
     }
     
     private func advance() {
         if currentIndex + 1 < lesson.slides.count {
             withAnimation { currentIndex += 1 }
         } else {
-            onFinish()
+            goHome(true)
         }
     }
     
@@ -73,6 +86,10 @@ struct LessonView: View {
         if currentIndex > 0 {
             withAnimation { currentIndex -= 1 }
         }
+    }
+    
+    private func toggleExitConfirmation() {
+        isShowingExitConfirmation = true
     }
 }
 
