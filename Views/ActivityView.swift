@@ -8,38 +8,33 @@
 import Flow
 import SwiftUI
 
-enum ActivityRoute {
-    case next
-    case home
-}
-
 struct ActivityView: View {
-    let lesson: Lesson
-    let onFinish: (ActivityRoute) -> Void
+    let activity: Activity
+    let isLast: Bool
+    let onCompletion: () -> Void
     
     let initialBlocks: [Block]
     @State private var allBlocks: [Block]
     @State private var usedBlocks: [Block] = []
     
-    init(lesson: Lesson, onFinish: @escaping (ActivityRoute) -> Void) {
-        self.lesson = lesson
-        self.onFinish = onFinish
+    @State private var isShowingHint = false
+    @State private var wasCorrect: Bool?
+    
+    init(activity: Activity, isLast: Bool, onCompletion: @escaping () -> Void) {
+        self.activity = activity
+        self.isLast = isLast
+        self.onCompletion = onCompletion
         
-        let newBlocks = lesson.blocks.map {
+        let newBlocks = activity.blocks.map {
             Block(content: $0)
         }
         initialBlocks = newBlocks
         _allBlocks = State(initialValue: newBlocks)
     }
     
-    @State private var isShowingHint = false
-    @State private var isShowingResult = false
-    @State private var resultMessage = ""
-    @State private var wasCorrect = false
-    
     var body: some View {
         VStack {
-            Text(lesson.question)
+            Text(activity.question)
                 .font(.title)
                 .padding()
             
@@ -121,38 +116,42 @@ struct ActivityView: View {
             
             Spacer()
         }
-        .navigationTitle(lesson.title)
-        .navigationSubtitle(lesson.subtitle ?? "")
-        .navigationBarTitleDisplayMode(.inline)
+        .background {
+            switch wasCorrect {
+                case nil: Color.blue.opacity(0.2).ignoresSafeArea()
+                case true: Color.green.opacity(0.2).ignoresSafeArea()
+                case false: Color.red.opacity(0.2).ignoresSafeArea()
+            }
+        }
+        .disabled(wasCorrect != nil)
         .toolbar {
             ToolbarItem(placement: .destructiveAction) {
                 Button("Retry", systemImage: "arrow.trianglehead.counterclockwise", action: clearUserAnswer)
                     .tint(.red)
+                    .disabled(wasCorrect != nil)
             }
-            if lesson.hint != nil {
+            if activity.hint != nil {
                 ToolbarSpacer(placement: .primaryAction)
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
                         .tint(.yellow)
+                        .disabled(wasCorrect != nil)
                 }
             }
             ToolbarItem(placement: .bottomBar) {
-                Button("Submit", role: .confirm, action: verifyAnswer)
+                let (title, action, color): (String, () -> Void, Color) = switch wasCorrect {
+                    case nil: ("Submit", verifyAnswer, .blue)
+                    case true: (isLast ? "Finish" : "Next", nextQuestion, .green)
+                    case false: ("Retry", retryQuestion, .red)
+                }
+                Button(title, role: .confirm, action: action)
                     .font(.title)
                     .padding(8)
                     .buttonStyle(.glassProminent)
-                    .tint(.blue)
+                    .tint(color)
             }
         }
-        .alert(lesson.hint ?? "", isPresented: $isShowingHint) {}
-        .alert(resultMessage, isPresented: $isShowingResult) {
-            if wasCorrect {
-                Button("Home", role: .cancel) { onFinish(.home) }
-                Button("Next Activity", role: .confirm) { onFinish(.next) }
-            } else {
-                Button("Try Again", role: .close) {}
-            }
-        }
+        .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
     }
     
     private func showHint() {
@@ -170,12 +169,23 @@ struct ActivityView: View {
     private func verifyAnswer() {
         let userAnswer = usedBlocks.map(\.content).joined(separator: " ")
         
-        if userAnswer == lesson.answer {
-            wasCorrect = true
-            resultMessage = "Correct!"
-        } else {
-            resultMessage = "Incorrect."
+        withAnimation {
+            if userAnswer == activity.answer {
+                wasCorrect = true
+            } else {
+                wasCorrect = false
+            }
         }
-        isShowingResult = true
+    }
+    
+    private func nextQuestion() {
+        onCompletion()
+    }
+    
+    private func retryQuestion() {
+        clearUserAnswer()
+        withAnimation {
+            wasCorrect = nil
+        }
     }
 }
