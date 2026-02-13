@@ -141,7 +141,7 @@ struct ActivityView: View {
             ToolbarItem(placement: .bottomBar) {
                 let (title, action, color): (String, () -> Void, Color) = switch wasCorrect {
                     case nil: ("Submit", verifyAnswer, .blue)
-                    case true: (isLast ? "Finish" : "Next", nextQuestion, .green)
+                    case true: (isLast ? "Finish" : "Next", onCompletion, .green)
                     case false: ("Retry", retryQuestion, .red)
                 }
                 Button(title, role: .confirm, action: action)
@@ -176,10 +176,6 @@ struct ActivityView: View {
                 wasCorrect = false
             }
         }
-    }
-    
-    private func nextQuestion() {
-        onCompletion()
     }
     
     private func retryQuestion() {

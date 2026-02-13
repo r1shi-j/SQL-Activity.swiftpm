@@ -37,7 +37,7 @@ struct LessonView: View {
                             }
                             .id(activity.id)
                         case .info(let info):
-                            InfoView(info: info) {
+                            InfoView(info: info, isLast: currentIndex + 1 == lesson.slides.count) {
                                 lesson.slides[currentIndex].isComplete = true
                                 advance()
                             }

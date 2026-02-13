@@ -9,5 +9,8 @@ import Foundation
 
 struct Info: Equatable, Identifiable, Hashable {
     let id = UUID()
-    let content: String
+    let title: String
+    let paragraph1: String
+    let paragraph2: String
+    let paragraph3: String
 }
