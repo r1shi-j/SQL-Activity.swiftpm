@@ -112,6 +112,7 @@ struct ActivityView: View {
                 case nil: Color.blue.opacity(0.2).ignoresSafeArea()
                 case true: Color.green.opacity(0.2).ignoresSafeArea()
                 case false: Color.red.opacity(0.2).ignoresSafeArea()
+                case .some(_): Color.clear
             }
         }
         .toolbar {
@@ -122,7 +123,7 @@ struct ActivityView: View {
                         .disabled(session.wasCorrect != nil)
                 }
                 if activity.hint != nil {
-                    ToolbarSpacer(placement: .primaryAction)
+//                    ToolbarSpacer(placement: .primaryAction)
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
                             .tint(.yellow)
@@ -132,15 +133,26 @@ struct ActivityView: View {
             }
             ToolbarItem(placement: .bottomBar) {
                 let (title, action, color): (String, () -> Void, Color) = switch session.wasCorrect {
-                case nil: ("Submit", verifyAnswer, .blue)
-                case true: (isLast ? "Finish" : "Next", nextSlide, .green)
-                case false: ("Retry", retryQuestion, .red)
+                    case nil: ("Submit", verifyAnswer, .blue)
+                    case true: (isLast ? "Finish" : "Next", nextSlide, .green)
+                    case false: ("Retry", retryQuestion, .red)
+                    case .some(_): ("Oops", verifyAnswer, .primary)
                 }
-                Button(title, role: .confirm, action: action)
-                    .font(.title)
-                    .padding(8)
-                    .buttonStyle(.glassProminent)
-                    .tint(color)
+                if #available(iOS 26.0, *) {
+                    Button(title, action: action)
+                        .font(.title)
+                        .padding(8)
+                        .buttonStyle(.glassProminent)
+                        .tint(color)
+                } else {
+                    Button(title, action: action)
+                        .font(.title)
+                        .padding(8)
+                        .background(color)
+                        .clipShape(.capsule)
+                        .padding()
+                        .tint(.primary)
+                }
                 // bouncy animation if wasCorrect != nil
             }
         }

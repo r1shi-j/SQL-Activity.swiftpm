@@ -53,7 +53,7 @@ struct LessonView: View {
             }
         }
         .navigationTitle(lesson.title)
-        .navigationSubtitle(lesson.subtitle ?? "")
+//        .navigationSubtitle(lesson.subtitle ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .toolbar {
@@ -63,11 +63,21 @@ struct LessonView: View {
             if currentIndex > 0 {
                 if lesson.slides.indices.contains(currentIndex-1) {
                     ToolbarItem(placement: .bottomBar) {
-                        Button("Back", role: .close, action: goBack)
-                            .font(.title)
-                            .padding(8)
-                            .buttonStyle(.glassProminent)
-                            .tint(.indigo)
+                        if #available(iOS 26.0, *) {
+                            Button("Back", action: goBack)
+                                .font(.title)
+                                .padding(8)
+                                .buttonStyle(.glassProminent)
+                                .tint(.indigo)
+                        } else {
+                            Button("Back", action: goBack)
+                                .font(.title)
+                                .padding(8)
+                                .background(.indigo)
+                                .clipShape(.capsule)
+                                .padding()
+                                .tint(.primary)
+                        }
                     }
                 }
             }

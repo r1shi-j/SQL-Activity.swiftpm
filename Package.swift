@@ -10,7 +10,7 @@ import AppleProductTypes
 let package = Package(
     name: "SQL Activity",
     platforms: [
-        .iOS("26.0")
+        .iOS("18.1")
     ],
     products: [
         .iOSApplication(
@@ -31,7 +31,8 @@ let package = Package(
                 .landscapeRight,
                 .landscapeLeft,
                 .portraitUpsideDown(.when(deviceFamilies: [.pad]))
-            ]
+            ],
+            appCategory: .education
         )
     ],
     dependencies: [

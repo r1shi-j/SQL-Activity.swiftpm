@@ -58,11 +58,21 @@ struct InfoView: View {
         }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
-                Button(isLast ? "Finish" : "Next", role: .confirm, action: onCompletion)
-                    .font(.title)
-                    .padding(8)
-                    .buttonStyle(.glassProminent)
-                    .tint(.blue)
+                if #available(iOS 26.0, *) {
+                    Button(isLast ? "Finish" : "Next", action: onCompletion)
+                        .font(.title)
+                        .padding(8)
+                        .buttonStyle(.glassProminent)
+                        .tint(.blue)
+                } else {
+                    Button(isLast ? "Finish" : "Next", action: onCompletion)
+                        .font(.title)
+                        .padding(8)
+                        .background(.blue)
+                        .clipShape(.capsule)
+                        .padding()
+                        .tint(.primary)
+                }
             }
         }
     }
