@@ -16,7 +16,7 @@ struct Lesson: Equatable, Identifiable, Hashable {
 }
 
 extension Lesson {
-    static let defaultLessons = [
+    nonisolated(unsafe) static let defaultLessons = [
         Lesson(
             title: "L1 Activity 1", subtitle: "Basic SQL Queries",
             slides: [

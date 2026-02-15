@@ -12,5 +12,12 @@ struct Activity: Equatable, Identifiable, Hashable {
     let question: String
     let hint: String?
     let answer: String
-    let blocks: [String]
+    let initialBlocks: [Block]
+    
+    init(question: String, hint: String?, answer: String, blocks: [String]) {
+        self.question = question
+        self.hint = hint
+        self.answer = answer
+        self.initialBlocks = blocks.map { Block(content: $0) }
+    }
 }

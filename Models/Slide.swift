@@ -16,6 +16,7 @@ struct Slide: Identifiable, Hashable {
     let id = UUID()
     let kind: Kind
     var isComplete = false
+    var activitySession = ActivitySession()
     
     static func == (lhs: Slide, rhs: Slide) -> Bool {
         lhs.id == rhs.id

@@ -31,7 +31,11 @@ struct LessonView: View {
                 Group {
                     switch slide.kind {
                         case .activity(let activity):
-                            ActivityView(activity: activity, isLast: currentIndex + 1 == lesson.slides.count) {
+                            ActivityView(
+                                activity: activity,
+                                session: lesson.slides[currentIndex].activitySession,
+                                isLast: currentIndex + 1 == lesson.slides.count
+                            ) {
                                 lesson.slides[currentIndex].isComplete = true
                                 advance()
                             }
@@ -44,15 +48,6 @@ struct LessonView: View {
                             .id(info.id)
                     }
                 }
-//                HStack {
-//                    if currentIndex > 0 {
-//                        Button("Back") {goBack()}
-//                    }
-//                    Spacer()
-//                    if slide.isComplete {
-//                        Button(currentIndex + 1 == slides.count ? "Finish" : "Next") {}
-//                    }
-//                }
             } else {
                 ContentUnavailableView("No content", systemImage: "rectangle.on.rectangle.slash", description: Text("There appears to be no content here. Try again later."))
             }
@@ -65,10 +60,24 @@ struct LessonView: View {
             ToolbarItem(placement: .navigation) {
                 Button("Back", systemImage: "chevron.left", action: toggleExitConfirmation)
             }
+            if currentIndex > 0 {
+                if lesson.slides.indices.contains(currentIndex-1) {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Back", role: .close, action: goBack)
+                            .font(.title)
+                            .padding(8)
+                            .buttonStyle(.glassProminent)
+                            .tint(.indigo)
+                    }
+                }
+            }
         }
-        .alert("Are you sure you want you want to exit this lesson?", isPresented: $isShowingExitConfirmation) {
+        .alert("Are you sure you want to exit this lesson?", isPresented: $isShowingExitConfirmation) {
             Button("No", role: .cancel) {}
-            Button("Yes", role: .destructive) { goHome(false) }
+            Button("Yes", role: .destructive) {
+                resetLesson()
+                goHome(false)
+            }
         } message: {
             Text("Your progress will be lost.")
         }
@@ -89,7 +98,19 @@ struct LessonView: View {
     }
     
     private func toggleExitConfirmation() {
-        isShowingExitConfirmation = true
+        if lesson.isComplete == true {
+            goHome(true)
+        } else {
+            isShowingExitConfirmation = true
+        }
+    }
+    
+    private func resetLesson() {
+        lesson.slides.forEach {
+            $0.activitySession.usedIndices.removeAll()
+            $0.activitySession.wasCorrect = nil
+            $0.activitySession.hasBeenCompleted = false
+        }
     }
 }
 

@@ -10,26 +10,25 @@ import SwiftUI
 
 struct ActivityView: View {
     let activity: Activity
+    var session: ActivitySession
     let isLast: Bool
     let onCompletion: () -> Void
     
-    let initialBlocks: [Block]
-    @State private var allBlocks: [Block]
+    @State private var availableBlocks: [Block]
     @State private var usedBlocks: [Block] = []
-    
     @State private var isShowingHint = false
-    @State private var wasCorrect: Bool?
     
-    init(activity: Activity, isLast: Bool, onCompletion: @escaping () -> Void) {
+    init(activity: Activity, session: ActivitySession, isLast: Bool, onCompletion: @escaping () -> Void) {
         self.activity = activity
+        self.session = session
         self.isLast = isLast
         self.onCompletion = onCompletion
         
-        let newBlocks = activity.blocks.map {
-            Block(content: $0)
-        }
-        initialBlocks = newBlocks
-        _allBlocks = State(initialValue: newBlocks)
+        let used = session.usedIndices.map { activity.initialBlocks[$0] }
+        self._usedBlocks = State(initialValue: used)
+        
+        let available = activity.initialBlocks.enumerated().filter({ !Set(session.usedIndices).contains($0.offset) }).map({ $0.element })
+        self._availableBlocks = State(initialValue: available)
     }
     
     var body: some View {
@@ -47,13 +46,7 @@ struct ActivityView: View {
             HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
                 ForEach(usedBlocks, id: \.id) { block in
                     Button(block.content) {
-                        withAnimation {
-                            if let removeIndex = usedBlocks.firstIndex(where: { $0.id == block.id }) {
-                                var moved = usedBlocks.remove(at: removeIndex)
-                                moved.isUsed = false
-                                allBlocks.append(moved)
-                            }
-                        }
+                        removeBlock(block)
                     }
                     .buttonStyle(GlassBlockButtonStyle(color: .green.opacity(0.4)))
                     .frame(height: 70)
@@ -61,97 +54,119 @@ struct ActivityView: View {
             }
             .frame(maxWidth: 800)
             
-            Divider().padding(.vertical)
-            
-            Text("Available Blocks")
-                .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-            
-            HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
-                ForEach(allBlocks, id: \.id) { block in
-                    Button(block.content) {
-                        withAnimation {
-                            if let index = allBlocks.firstIndex(where: { $0.id == block.id }) {
-                                var moved = allBlocks.remove(at: index)
-                                moved.isUsed = true
-                                usedBlocks.append(moved)
-                            }
+            if !session.hasBeenCompleted {
+                Divider().padding(.vertical)
+                
+                Text("Available Blocks")
+                    .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                
+                HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
+                    ForEach(availableBlocks, id: \.id) { block in
+                        Button(block.content) {
+                            addBlock(block)
                         }
+                        .buttonStyle(GlassBlockButtonStyle(color: .red.opacity(0.4)))
+                        .frame(height: 70)
                     }
-                    .buttonStyle(GlassBlockButtonStyle(color: .red.opacity(0.4)))
-                    .frame(height: 70)
                 }
+                .frame(maxWidth: 700)
+                
+                Divider().padding(.vertical)
             }
-            .frame(maxWidth: 700)
             
-//            @State private var offset = CGSize.zero
-//            @State private var movingBlock: Block? = nil
-//            LazyVGrid(
-//                columns: [GridItem(.adaptive(minimum: 130, maximum: 200))],
-//                alignment: .center,
-//                spacing: 10
-//            ) {
-//                ForEach(allBlocks, id: \.id) { block in
-//                    drawBlock(with: block.content)
-//                        .offset(x: movingBlock?.id == block.id ? offset.width : 0, y: movingBlock?.id == block.id ? offset.height : 0)
-//                        .frame(height: 70)
-//                        .gesture(
-//                            DragGesture()
-//                                .onChanged { gesture in
-//                                    offset = gesture.translation
-//                                    movingBlock = block
-//                                }
-//                                .onEnded { _ in
-//                                    withAnimation(.spring) {
-//                                        offset = .zero
-//                                        movingBlock = nil
-//                                    }
-//                                }
-//                        )
-//                }
-//            }
-//            .frame(maxWidth: 700)
-            
-            Divider().padding(.vertical)
+            //            @State private var offset = CGSize.zero
+            //            @State private var movingBlock: Block? = nil
+            //            LazyVGrid(
+            //                columns: [GridItem(.adaptive(minimum: 130, maximum: 200))],
+            //                alignment: .center,
+            //                spacing: 10
+            //            ) {
+            //                ForEach(allBlocks, id: \.id) { block in
+            //                    drawBlock(with: block.content)
+            //                        .offset(x: movingBlock?.id == block.id ? offset.width : 0, y: movingBlock?.id == block.id ? offset.height : 0)
+            //                        .frame(height: 70)
+            //                        .gesture(
+            //                            DragGesture()
+            //                                .onChanged { gesture in
+            //                                    offset = gesture.translation
+            //                                    movingBlock = block
+            //                                }
+            //                                .onEnded { _ in
+            //                                    withAnimation(.spring) {
+            //                                        offset = .zero
+            //                                        movingBlock = nil
+            //                                    }
+            //                                }
+            //                        )
+            //                }
+            //            }
+            //            .frame(maxWidth: 700)
             
             Spacer()
         }
+        .disabled(session.wasCorrect != nil)
+        .disabled(session.hasBeenCompleted)
         .background {
-            switch wasCorrect {
+            switch session.wasCorrect {
                 case nil: Color.blue.opacity(0.2).ignoresSafeArea()
                 case true: Color.green.opacity(0.2).ignoresSafeArea()
                 case false: Color.red.opacity(0.2).ignoresSafeArea()
             }
         }
-        .disabled(wasCorrect != nil)
         .toolbar {
-            ToolbarItem(placement: .destructiveAction) {
-                Button("Retry", systemImage: "arrow.trianglehead.counterclockwise", action: clearUserAnswer)
-                    .tint(.red)
-                    .disabled(wasCorrect != nil)
-            }
-            if activity.hint != nil {
-                ToolbarSpacer(placement: .primaryAction)
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
-                        .tint(.yellow)
-                        .disabled(wasCorrect != nil)
+            if !session.hasBeenCompleted {
+                ToolbarItem(placement: .destructiveAction) {
+                    Button("Retry", systemImage: "arrow.trianglehead.counterclockwise", action: clearUserAnswer)
+                        .tint(.red)
+                        .disabled(session.wasCorrect != nil)
+                }
+                if activity.hint != nil {
+                    ToolbarSpacer(placement: .primaryAction)
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
+                            .tint(.yellow)
+                            .disabled(session.wasCorrect != nil)
+                    }
                 }
             }
             ToolbarItem(placement: .bottomBar) {
-                let (title, action, color): (String, () -> Void, Color) = switch wasCorrect {
-                    case nil: ("Submit", verifyAnswer, .blue)
-                    case true: (isLast ? "Finish" : "Next", onCompletion, .green)
-                    case false: ("Retry", retryQuestion, .red)
+                let (title, action, color): (String, () -> Void, Color) = switch session.wasCorrect {
+                case nil: ("Submit", verifyAnswer, .blue)
+                case true: (isLast ? "Finish" : "Next", nextSlide, .green)
+                case false: ("Retry", retryQuestion, .red)
                 }
                 Button(title, role: .confirm, action: action)
                     .font(.title)
                     .padding(8)
                     .buttonStyle(.glassProminent)
                     .tint(color)
+                // bouncy animation if wasCorrect != nil
             }
         }
         .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
+    }
+    
+    private func addBlock(_ block: Block) {
+        guard !usedBlocks.map(\.id).contains(block.id) else { return }
+        if let index = activity.initialBlocks.firstIndex(where: { $0.id == block.id }) {
+            withAnimation {
+                usedBlocks.append(activity.initialBlocks[index])
+                availableBlocks.removeAll { $0.id == block.id }
+                session.usedIndices.append(index)
+            }
+        }
+    }
+    
+    private func removeBlock(_ block: Block) {
+        guard !availableBlocks.map(\.id).contains(block.id) else { return }
+        if let index = activity.initialBlocks.firstIndex(where: { $0.id == block.id }) {
+            withAnimation {
+                usedBlocks.removeAll { $0.id == block.id }
+                availableBlocks.append(activity.initialBlocks[index])
+                session.usedIndices.removeAll { $0 == index }
+            }
+        }
     }
     
     private func showHint() {
@@ -159,9 +174,10 @@ struct ActivityView: View {
     }
     
     private func clearUserAnswer() {
-        guard allBlocks != initialBlocks else { return }
+        guard availableBlocks != activity.initialBlocks else { return }
         withAnimation {
-            allBlocks = initialBlocks
+            session.usedIndices.removeAll()
+            availableBlocks = activity.initialBlocks
             usedBlocks = []
         }
     }
@@ -170,18 +186,21 @@ struct ActivityView: View {
         let userAnswer = usedBlocks.map(\.content).joined(separator: " ")
         
         withAnimation {
-            if userAnswer == activity.answer {
-                wasCorrect = true
-            } else {
-                wasCorrect = false
-            }
+            session.wasCorrect = userAnswer == activity.answer
         }
     }
     
     private func retryQuestion() {
         clearUserAnswer()
         withAnimation {
-            wasCorrect = nil
+            session.wasCorrect = nil
+        }
+    }
+    
+    private func nextSlide() {
+        withAnimation {
+            session.hasBeenCompleted = true
+            onCompletion()
         }
     }
 }
