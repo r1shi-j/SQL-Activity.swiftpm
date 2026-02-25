@@ -35,8 +35,9 @@ extension Lesson {
                 ))),
                 Slide(kind: .activity(Activity(
                     question: "Select all columns from Animals.",
-                    tip: "Tip: Tap a block or drag it into Your Answer. Drag a block back to remove it.",
+                    tip: "Tip: Tap a block to add/remove. Long-press the grip to reorder.",
                     hint: "Remember: SELECT * FROM table.",
+                    schema: "Animals(id, name, species, age)",
                     answer: "SELECT * FROM Animals",
                     blocks: ["SELECT", "FROM", "*", "Animals", "Pets", "WHERE", "age", ">", "2"]
                 ))),
@@ -44,6 +45,7 @@ extension Lesson {
                     question: "Select name and species from Animals.",
                     tip: "Tip: Use a comma between columns.",
                     hint: "List columns before FROM.",
+                    schema: "Animals(id, name, species, age)",
                     answer: "SELECT name , species FROM Animals",
                     blocks: ["SELECT", "FROM", "name", "species", "age", "Animals", "Owners", ","]
                 ))),
@@ -80,8 +82,9 @@ extension Lesson {
                 ))),
                 Slide(kind: .activity(Activity(
                     question: "Find all dogs older than 3.",
-                    tip: "Tip: Tap a block or drag it into Your Answer. Drag a block back to remove it.",
+                    tip: "Tip: Tap a block to add/remove. Long-press the grip to reorder.",
                     hint: "Use WHERE age > 3.",
+                    schema: "Dogs(id, name, age, breed)",
                     answer: "SELECT * FROM Dogs WHERE age > 3",
                     blocks: ["SELECT", "FROM", "WHERE", "*", "Dogs", "Cats", "age", "3", "2", ">", "<", "="]
                 ))),
@@ -89,8 +92,9 @@ extension Lesson {
                     question: "Select name and age for dogs older than 3 and order by age desc.",
                     tip: "Tip: ORDER BY comes after WHERE.",
                     hint: "DESC is descending.",
+                    schema: "Dogs(id, name, age, breed)",
                     answer: "SELECT name , age FROM Dogs WHERE age > 3 ORDER BY age DESC",
-                    blocks: ["SELECT", "FROM", "WHERE", "ORDER BY", "name", "age", "Dogs", "Animals", ">", "3", "DESC", "ASC", ","]
+                    blocks: ["SELECT", "FROM", "WHERE", "ORDER BY", "name", "age", "age", "Dogs", "Animals", ">", "3", "DESC", "ASC", ","]
                 ))),
                 Slide(kind: .info(Info(
                     title: "Sort it out",
@@ -127,6 +131,7 @@ extension Lesson {
                     question: "List owner names with their pet names.",
                     tip: "Tip: The ON clause connects the keys.",
                     hint: "Owners.id matches Pets.owner_id.",
+                    schema: "Owners(id, name, city)\nPets(id, name, owner_id)",
                     answer: "SELECT Owners.name , Pets.name FROM Owners INNER JOIN Pets ON Owners.id = Pets.owner_id",
                     blocks: ["SELECT", "FROM", "INNER JOIN", "LEFT JOIN", "ON", "Owners", "Pets", "Owners.name", "Pets.name", "Owners.id", "Pets.owner_id", ","]
                 ))),
@@ -134,6 +139,7 @@ extension Lesson {
                     question: "Show pet name and owner city using a join.",
                     tip: "Tip: Choose columns from each table.",
                     hint: "Pets.owner_id links to Owners.id.",
+                    schema: "Owners(id, name, city)\nPets(id, name, owner_id)",
                     answer: "SELECT Pets.name , Owners.city FROM Pets INNER JOIN Owners ON Pets.owner_id = Owners.id",
                     blocks: ["SELECT", "FROM", "INNER JOIN", "ON", "Owners", "Pets", "Pets.name", "Owners.city", "Owners.name", "Pets.owner_id", "Owners.id", ","]
                 ))),
@@ -172,6 +178,7 @@ extension Lesson {
                     question: "Count animals per species.",
                     tip: "Tip: COUNT goes in the SELECT list.",
                     hint: "Use GROUP BY species.",
+                    schema: "Animals(id, name, species, age)",
                     answer: "SELECT species , COUNT ( * ) FROM Animals GROUP BY species",
                     blocks: ["SELECT", "FROM", "GROUP BY", "COUNT", "(", ")", "*", "species", "Animals", "HAVING", ">", "2", ","]
                 ))),
@@ -179,8 +186,9 @@ extension Lesson {
                     question: "Show species with more than 2 animals.",
                     tip: "Tip: HAVING filters groups after GROUP BY.",
                     hint: "Use HAVING COUNT ( * ) > 2.",
+                    schema: "Animals(id, name, species, age)",
                     answer: "SELECT species , COUNT ( * ) FROM Animals GROUP BY species HAVING COUNT ( * ) > 2",
-                    blocks: ["SELECT", "FROM", "GROUP BY", "HAVING", "COUNT", "(", ")", "*", "species", "Animals", ">", "2", ","]
+                    blocks: ["SELECT", "FROM", "GROUP BY", "HAVING", "COUNT", "COUNT", "(", ")", "*", "species", "Animals", ">", "2", ","]
                 ))),
                 Slide(kind: .info(Info(
                     title: "You are aggregating now",
