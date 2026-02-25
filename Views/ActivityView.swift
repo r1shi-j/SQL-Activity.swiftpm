@@ -53,14 +53,25 @@ struct ActivityView: View {
             
             HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
                 ForEach(usedBlocks, id: \.id) { block in
-                    Button(block.content) {
+                    blockButton(block, color: .green.opacity(0.4)) {
                         removeBlock(block)
                     }
-                    .buttonStyle(GlassBlockButtonStyle(color: .green.opacity(0.4)))
-                    .frame(height: 70)
+                    .draggable(block.id.uuidString, preview: { dragPreview(for: block) })
+                    .dropDestination(for: String.self) { items, _ in
+                        guard let draggedId = items.compactMap({ UUID(uuidString: $0) }).first else { return false }
+                        handleDropOnUsed(draggedId: draggedId, targetId: block.id)
+                        return true
+                    }
                 }
             }
-            .frame(maxWidth: 800)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
+//            .contentShape(.capsule)
+            .dropDestination(for: String.self) { items, _ in
+                guard let id = items.compactMap({ UUID(uuidString: $0) }).first else { return false }
+                moveBlockToUsed(id: id)
+                return true
+            }
             
             if !session.hasBeenCompleted {
                 Divider().padding(.vertical)
@@ -71,45 +82,28 @@ struct ActivityView: View {
                 
                 HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
                     ForEach(availableBlocks, id: \.id) { block in
-                        Button(block.content) {
+                        blockButton(block, color: .red.opacity(0.4)) {
                             addBlock(block)
                         }
-                        .buttonStyle(GlassBlockButtonStyle(color: .red.opacity(0.4)))
-                        .frame(height: 70)
+                        .draggable(block.id.uuidString, preview: { dragPreview(for: block) })
+                        .dropDestination(for: String.self) { items, _ in
+                            guard let draggedId = items.compactMap({ UUID(uuidString: $0) }).first else { return false }
+                            handleDropOnAvailable(draggedId: draggedId, targetId: block.id)
+                            return true
+                        }
                     }
                 }
-                .frame(maxWidth: 700)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal)
+//                .contentShape(.capsule)
+                .dropDestination(for: String.self) { items, _ in
+                    guard let id = items.compactMap({ UUID(uuidString: $0) }).first else { return false }
+                    moveBlockToAvailable(id: id)
+                    return true
+                }
                 
                 Divider().padding(.vertical)
             }
-            
-            //            @State private var offset = CGSize.zero
-            //            @State private var movingBlock: Block? = nil
-            //            LazyVGrid(
-            //                columns: [GridItem(.adaptive(minimum: 130, maximum: 200))],
-            //                alignment: .center,
-            //                spacing: 10
-            //            ) {
-            //                ForEach(allBlocks, id: \.id) { block in
-            //                    drawBlock(with: block.content)
-            //                        .offset(x: movingBlock?.id == block.id ? offset.width : 0, y: movingBlock?.id == block.id ? offset.height : 0)
-            //                        .frame(height: 70)
-            //                        .gesture(
-            //                            DragGesture()
-            //                                .onChanged { gesture in
-            //                                    offset = gesture.translation
-            //                                    movingBlock = block
-            //                                }
-            //                                .onEnded { _ in
-            //                                    withAnimation(.spring) {
-            //                                        offset = .zero
-            //                                        movingBlock = nil
-            //                                    }
-            //                                }
-            //                        )
-            //                }
-            //            }
-            //            .frame(maxWidth: 700)
             
             Spacer()
         }
@@ -167,25 +161,83 @@ struct ActivityView: View {
         .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
     }
     
+    private func blockButton(_ block: Block, color: Color, action: @escaping () -> Void) -> some View {
+        Button(block.content, action: action)
+            .buttonStyle(GlassBlockButtonStyle(color: color))
+            .contentShape(.capsule)
+            .frame(height: 70)
+            .onTapGesture(perform: action)
+    }
+    
+    private func dragPreview(for block: Block) -> some View {
+        Text(block.content)
+            .font(.title3)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.black.opacity(0.15))
+            .clipShape(.capsule)
+    }
+    
     private func addBlock(_ block: Block) {
-        guard !usedBlocks.map(\.id).contains(block.id) else { return }
-        if let index = activity.initialBlocks.firstIndex(where: { $0.id == block.id }) {
-            withAnimation {
-                usedBlocks.append(activity.initialBlocks[index])
-                availableBlocks.removeAll { $0.id == block.id }
-                session.usedIndices.append(index)
-            }
-        }
+        moveBlockToUsed(id: block.id)
     }
     
     private func removeBlock(_ block: Block) {
-        guard !availableBlocks.map(\.id).contains(block.id) else { return }
-        if let index = activity.initialBlocks.firstIndex(where: { $0.id == block.id }) {
-            withAnimation {
-                usedBlocks.removeAll { $0.id == block.id }
-                availableBlocks.append(activity.initialBlocks[index])
-                session.usedIndices.removeAll { $0 == index }
-            }
+        moveBlockToAvailable(id: block.id)
+    }
+    
+    private func handleDropOnUsed(draggedId: UUID, targetId: UUID) {
+        if usedBlocks.contains(where: { $0.id == draggedId }) {
+            reorderUsedBlocks(draggedId: draggedId, targetId: targetId)
+        } else {
+            moveBlockToUsed(id: draggedId)
+        }
+    }
+    
+    private func handleDropOnAvailable(draggedId: UUID, targetId: UUID) {
+        if availableBlocks.contains(where: { $0.id == draggedId }) {
+            return
+        }
+        moveBlockToAvailable(id: draggedId)
+    }
+    
+    private func moveBlockToUsed(id: UUID) {
+        guard !usedBlocks.contains(where: { $0.id == id }) else { return }
+        guard let sourceIndex = availableBlocks.firstIndex(where: { $0.id == id }) else { return }
+        
+        withAnimation {
+            let block = availableBlocks.remove(at: sourceIndex)
+            usedBlocks.append(block)
+            syncSessionUsedIndices()
+        }
+    }
+    
+    private func moveBlockToAvailable(id: UUID) {
+        guard !availableBlocks.contains(where: { $0.id == id }) else { return }
+        guard let sourceIndex = usedBlocks.firstIndex(where: { $0.id == id }) else { return }
+        
+        withAnimation {
+            let block = usedBlocks.remove(at: sourceIndex)
+            availableBlocks.append(block)
+            syncSessionUsedIndices()
+        }
+    }
+    
+    private func reorderUsedBlocks(draggedId: UUID, targetId: UUID) {
+        guard let fromIndex = usedBlocks.firstIndex(where: { $0.id == draggedId }),
+              let toIndex = usedBlocks.firstIndex(where: { $0.id == targetId }),
+              fromIndex != toIndex else { return }
+        
+        withAnimation {
+            let block = usedBlocks.remove(at: fromIndex)
+            usedBlocks.insert(block, at: toIndex)
+            syncSessionUsedIndices()
+        }
+    }
+    
+    private func syncSessionUsedIndices() {
+        session.usedIndices = usedBlocks.compactMap { block in
+            activity.initialBlocks.firstIndex(where: { $0.id == block.id })
         }
     }
     
