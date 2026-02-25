@@ -18,48 +18,182 @@ struct Lesson: Equatable, Identifiable, Hashable {
 extension Lesson {
     nonisolated(unsafe) static let defaultLessons = [
         Lesson(
-            title: "L1 Activity 1", subtitle: "Basic SQL Queries",
+            title: "L1 Select Basics", subtitle: "SELECT / FROM",
             slides: [
                 Slide(kind: .info(Info(
-                    title: "My title",
-                    paragraph1: "Dolor id dolor id adipisicing id occaecat excepteur qui proident dolore. Aute ex enim aliquip. Id dolor dolor dolore nostrud proident esse culpa ipsum mollit. Ex elit culpa consequat minim veniam sunt ipsum. Tempor et duis incididunt Lorem occaecat.",
-                    paragraph2: "Cupidatat dolore sit dolor et non aliqua aliquip proident quis Lorem excepteur. Ipsum proident et velit in sunt proident quis quis ipsum enim. Incididunt dolor culpa officia pariatur non ut eiusmod sint voluptate nulla laborum mollit.",
-                    paragraph3: "Sit occaecat nostrud laborum ut exercitation esse duis quis fugiat ad sit aute velit amet cillum. Irure ea esse aute reprehenderit aliquip. Nisi nulla ex adipisicing magna. Sit qui in occaecat id deserunt."
+                    title: "Start with SELECT",
+                    sections: [
+                        InfoSection(
+                            title: "The core idea",
+                            body: "A SELECT query asks a database to show data. The FROM clause tells SQL which table to read from."
+                        ),
+                        InfoSection(
+                            title: "Pick columns",
+                            body: "Use * to select every column, or list specific column names separated by commas."
+                        )
+                    ]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Write an SQL query to select all fields from the table Animals, for the animals older than 2 years.",
-                    hint: "This is a hint",
-                    answer: "SELECT",// * FROM Animals WHERE age > 2",
-                    blocks: ["SELECT", "FROM", "WHERE", "*", "Name", "City", "Dogs", "Animals", "Pets", "age", "height", "2", "1.7", "3", "5", "<", ">", "="]
+                    question: "Select all columns from Animals.",
+                    tip: "Tip: Tap a block or drag it into Your Answer. Drag a block back to remove it.",
+                    hint: "Remember: SELECT * FROM table.",
+                    answer: "SELECT * FROM Animals",
+                    blocks: ["SELECT", "FROM", "*", "Animals", "Pets", "WHERE", "age", ">", "2"]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Select the name and age for dogs older than 3 and order by age desc.",
-                    hint: nil,
-                    answer: "SELECT",// name , age FROM Dogs WHERE age > 3 ORDER BY age DESC",
-                    blocks: ["SELECT", "FROM", "WHERE", "ORDER BY", "name", "age", "Dogs", "Animals", ">", "age", "3", "DESC", "ASC", ",", "age"]
+                    question: "Select name and species from Animals.",
+                    tip: "Tip: Use a comma between columns.",
+                    hint: "List columns before FROM.",
+                    answer: "SELECT name , species FROM Animals",
+                    blocks: ["SELECT", "FROM", "name", "species", "age", "Animals", "Owners", ","]
                 ))),
                 Slide(kind: .info(Info(
-                    title: "My conclusion title",
-                    paragraph1: "Magna enim nostrud labore elit consequat consectetur minim nisi aute tempor veniam ea nostrud ipsum eu. Elit commodo magna minim cupidatat laboris Lorem excepteur non minim fugiat. Commodo occaecat qui Lorem adipisicing Lorem cillum et enim. Ut sunt amet laboris excepteur nulla do aliquip cillum cillum aute ut officia aliquip est. Quis ea ut incididunt commodo laboris nostrud magna et enim ullamco dolore qui qui non consequat. Id ut consequat dolor in aliqua. Velit dolore consectetur Lorem minim magna nulla veniam occaecat labore culpa reprehenderit. Commodo eu sit ullamco consequat in commodo ex ex.",
-                    paragraph2: "Mollit ex sint magna. Aute eu nulla id esse. Cillum adipisicing excepteur voluptate qui eiusmod. Nisi pariatur sint enim do esse elit veniam laboris amet quis officia voluptate. Do nisi occaecat qui. Esse deserunt laboris sint eu irure deserunt reprehenderit mollit sint sit id dolor aliqua dolore.",
-                    paragraph3: "Exercitation laboris sint veniam Lorem mollit aliqua laboris eiusmod irure aliquip. Irure cillum adipisicing culpa nostrud laboris ad laborum sit enim tempor. Incididunt minim ut magna laboris. Deserunt eu et exercitation occaecat sint duis. Eiusmod aliquip fugiat excepteur. Ex est sint excepteur elit."
-                ))),
+                    title: "Nice work",
+                    sections: [
+                        InfoSection(
+                            title: "What you learned",
+                            body: "SELECT + FROM is the backbone of SQL. Every other clause builds on these two."
+                        ),
+                        InfoSection(
+                            title: "Up next",
+                            body: "When you are ready, move on to filtering and sorting results."
+                        )
+                    ]
+                )))
             ]
         ),
         Lesson(
-            title: "L2 Activity 2", subtitle: "Filtering and Ordering",
+            title: "L2 Filtering and Sorting", subtitle: "WHERE / ORDER BY",
             slides: [
-                Slide(kind: .activity(Activity(
-                    question: "Write an SQL query to select all fields from the table Animals, for the animals older than 2 years.",
-                    hint: "This is a hint",
-                    answer: "SELECT",// * FROM Animals WHERE age > 2",
-                    blocks: ["SELECT", "FROM", "WHERE", "*", "Name", "City", "Dogs", "Animals", "Pets", "age", "height", "2", "1.7", "3", "5", "<", ">", "="]
+                Slide(kind: .info(Info(
+                    title: "Filter the rows",
+                    sections: [
+                        InfoSection(
+                            title: "WHERE",
+                            body: "WHERE filters results so you only get the rows you care about."
+                        ),
+                        InfoSection(
+                            title: "ORDER BY",
+                            body: "ORDER BY sorts results. DESC means descending, ASC means ascending."
+                        )
+                    ]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Select the name and age for dogs older than 3 and order by age desc.",
-                    hint: nil,
-                    answer: "SELECT",// name , age FROM Dogs WHERE age > 3 ORDER BY age DESC",
-                    blocks: ["SELECT", "FROM", "WHERE", "ORDER BY", "name", "age", "Dogs", "Animals", ">", "age", "3", "DESC", "ASC", ",", "age"]
+                    question: "Find all dogs older than 3.",
+                    tip: "Tip: Tap a block or drag it into Your Answer. Drag a block back to remove it.",
+                    hint: "Use WHERE age > 3.",
+                    answer: "SELECT * FROM Dogs WHERE age > 3",
+                    blocks: ["SELECT", "FROM", "WHERE", "*", "Dogs", "Cats", "age", "3", "2", ">", "<", "="]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "Select name and age for dogs older than 3 and order by age desc.",
+                    tip: "Tip: ORDER BY comes after WHERE.",
+                    hint: "DESC is descending.",
+                    answer: "SELECT name , age FROM Dogs WHERE age > 3 ORDER BY age DESC",
+                    blocks: ["SELECT", "FROM", "WHERE", "ORDER BY", "name", "age", "Dogs", "Animals", ">", "3", "DESC", "ASC", ","]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Sort it out",
+                    sections: [
+                        InfoSection(
+                            title: "Chain clauses",
+                            body: "You can chain WHERE and ORDER BY to filter and then sort results."
+                        ),
+                        InfoSection(
+                            title: "Next step",
+                            body: "Next up: combining data from multiple tables with JOINs."
+                        )
+                    ]
+                )))
+            ]
+        ),
+        Lesson(
+            title: "L3 Joins", subtitle: "Combine tables",
+            slides: [
+                Slide(kind: .info(Info(
+                    title: "Two tables, one story",
+                    sections: [
+                        InfoSection(
+                            title: "JOINs",
+                            body: "JOINs combine rows from two tables using a shared key."
+                        ),
+                        InfoSection(
+                            title: "INNER JOIN",
+                            body: "INNER JOIN returns only rows that match in both tables."
+                        )
+                    ]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "List owner names with their pet names.",
+                    tip: "Tip: The ON clause connects the keys.",
+                    hint: "Owners.id matches Pets.owner_id.",
+                    answer: "SELECT Owners.name , Pets.name FROM Owners INNER JOIN Pets ON Owners.id = Pets.owner_id",
+                    blocks: ["SELECT", "FROM", "INNER JOIN", "LEFT JOIN", "ON", "Owners", "Pets", "Owners.name", "Pets.name", "Owners.id", "Pets.owner_id", ","]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "Show pet name and owner city using a join.",
+                    tip: "Tip: Choose columns from each table.",
+                    hint: "Pets.owner_id links to Owners.id.",
+                    answer: "SELECT Pets.name , Owners.city FROM Pets INNER JOIN Owners ON Pets.owner_id = Owners.id",
+                    blocks: ["SELECT", "FROM", "INNER JOIN", "ON", "Owners", "Pets", "Pets.name", "Owners.city", "Owners.name", "Pets.owner_id", "Owners.id", ","]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Joined up",
+                    sections: [
+                        InfoSection(
+                            title: "Why joins matter",
+                            body: "JOINs are how you tell bigger stories with your data."
+                        ),
+                        InfoSection(
+                            title: "Next step",
+                            body: "Next up: aggregation with COUNT and GROUP BY."
+                        )
+                    ]
+                )))
+            ]
+        ),
+        Lesson(
+            title: "L4 Aggregation", subtitle: "COUNT / GROUP BY / HAVING",
+            slides: [
+                Slide(kind: .info(Info(
+                    title: "Count and group",
+                    sections: [
+                        InfoSection(
+                            title: "Aggregation",
+                            body: "Aggregation lets you summarize data with functions like COUNT, SUM, and AVG."
+                        ),
+                        InfoSection(
+                            title: "GROUP BY + HAVING",
+                            body: "GROUP BY collects rows into groups. HAVING filters groups after they are made."
+                        )
+                    ]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "Count animals per species.",
+                    tip: "Tip: COUNT goes in the SELECT list.",
+                    hint: "Use GROUP BY species.",
+                    answer: "SELECT species , COUNT ( * ) FROM Animals GROUP BY species",
+                    blocks: ["SELECT", "FROM", "GROUP BY", "COUNT", "(", ")", "*", "species", "Animals", "HAVING", ">", "2", ","]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "Show species with more than 2 animals.",
+                    tip: "Tip: HAVING filters groups after GROUP BY.",
+                    hint: "Use HAVING COUNT ( * ) > 2.",
+                    answer: "SELECT species , COUNT ( * ) FROM Animals GROUP BY species HAVING COUNT ( * ) > 2",
+                    blocks: ["SELECT", "FROM", "GROUP BY", "HAVING", "COUNT", "(", ")", "*", "species", "Animals", ">", "2", ","]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "You are aggregating now",
+                    sections: [
+                        InfoSection(
+                            title: "What you learned",
+                            body: "COUNT and GROUP BY turn raw rows into useful summaries."
+                        ),
+                        InfoSection(
+                            title: "What’s next",
+                            body: "From here you can learn INSERT, UPDATE, and DELETE to change data."
+                        )
+                    ]
                 )))
             ]
         )

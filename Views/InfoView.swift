@@ -19,39 +19,28 @@ struct InfoView: View {
     }
     
     var body: some View {
-        VStack {
-            Text(info.title)
-                .font(.title)
-                .padding()
-            
-            Spacer()
-            
-            Text("SubHeading 1")
-                .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-            
-            Text(info.paragraph1)
-                .padding()
-            
-            Divider().padding(.vertical)
-            
-            Text("SubHeading 2")
-                .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-            
-            Text(info.paragraph2)
-                .padding()
-            
-            Divider().padding(.vertical)
-            
-            Text("SubHeading 3")
-                .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-            
-            Text(info.paragraph3)
-                .padding()
-            
-            Spacer()
+        ScrollView {
+            VStack(spacing: 16) {
+                Text(info.title)
+                    .font(.title)
+                    .padding(.top)
+                
+                ForEach(Array(info.sections.enumerated()), id: \.element.id) { index, section in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(section.title)
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(section.body)
+                    }
+                    .padding(.horizontal)
+                    
+                    if index != info.sections.indices.last {
+                        Divider()
+                    }
+                }
+                
+                Spacer(minLength: 24)
+            }
         }
         .background {
             Color.orange.opacity(0.2).ignoresSafeArea()

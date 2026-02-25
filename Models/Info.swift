@@ -7,10 +7,14 @@
 
 import Foundation
 
+struct InfoSection: Equatable, Identifiable, Hashable {
+    let id = UUID()
+    let title: String
+    let body: String
+}
+
 struct Info: Equatable, Identifiable, Hashable {
     let id = UUID()
     let title: String
-    let paragraph1: String
-    let paragraph2: String
-    let paragraph3: String
+    let sections: [InfoSection]
 }

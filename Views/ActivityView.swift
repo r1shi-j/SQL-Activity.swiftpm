@@ -37,6 +37,14 @@ struct ActivityView: View {
                 .font(.title)
                 .padding()
             
+            if let tip = activity.tip {
+                Text(tip)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+            
             Spacer()
             
             Text("Your Answer")

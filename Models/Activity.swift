@@ -10,12 +10,14 @@ import Foundation
 struct Activity: Equatable, Identifiable, Hashable {
     let id = UUID()
     let question: String
+    let tip: String?
     let hint: String?
     let answer: String
     let initialBlocks: [Block]
     
-    init(question: String, hint: String?, answer: String, blocks: [String]) {
+    init(question: String, tip: String? = nil, hint: String?, answer: String, blocks: [String]) {
         self.question = question
+        self.tip = tip
         self.hint = hint
         self.answer = answer
         self.initialBlocks = blocks.map { Block(content: $0) }
