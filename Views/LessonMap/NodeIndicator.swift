@@ -5,18 +5,18 @@ struct NodeIndicator: View {
     let accentColor: Color
     
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(nodeFill)
-                .frame(width: 22, height: 22)
-
-            if status == .completed {
-                Image(systemName: "checkmark")
-                    .font(.caption)
-                    .foregroundStyle(.white)
-            } else if status == .current {
+        if status == .completed {
+            Image(systemName: "checkmark.seal.fill")
+                .resizable()
+                .frame(width: 30, height: 30)
+                .foregroundStyle(nodeFill)
+        } else {
+            ZStack {
                 Circle()
-                    .strokeBorder(accentColor, lineWidth: 2)
+                    .fill(nodeFill)
+                    .frame(width: 22, height: 22)
+                Circle()
+                    .strokeBorder(nodeFill, lineWidth: 2)
                     .frame(width: 30, height: 30)
             }
         }
