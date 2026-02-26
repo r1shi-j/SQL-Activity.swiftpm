@@ -36,13 +36,15 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/tevelee/SwiftUI-Flow", "3.1.1"..<"4.0.0")
+        .package(url: "https://github.com/tevelee/SwiftUI-Flow", "3.1.1"..<"4.0.0"),
+        .package(url: "https://github.com/simibac/ConfettiSwiftUI", "3.0.0"..<"4.0.0")
     ],
     targets: [
         .executableTarget(
             name: "AppModule",
             dependencies: [
-                .product(name: "Flow", package: "swiftui-flow")
+                .product(name: "Flow", package: "swiftui-flow"),
+                .product(name: "ConfettiSwiftUI", package: "confettiswiftui")
             ],
             path: "."
         )

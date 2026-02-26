@@ -5,6 +5,7 @@
 //  Created by Rishi Jansari on 12/02/2026.
 //
 
+import ConfettiSwiftUI
 import SwiftUI
 
 struct LessonView: View {
@@ -15,6 +16,12 @@ struct LessonView: View {
     @State private var isShowingExitConfirmation = false
     @State private var isShowingCompletion = false
     @State private var isShowingAlreadyCompletedAlert: Bool
+    
+    @State private var counter1 = 1
+    @State private var counter2 = 1
+    @State private var counter3 = 1
+    @State private var counter4 = 1
+    @State private var counter5 = 1
     
     init(lesson: Binding<Lesson>, goHome: @escaping (Bool) -> Void) {
         _lesson = lesson
@@ -85,7 +92,27 @@ struct LessonView: View {
             }
         }
         .sheet(isPresented: $isShowingCompletion) {
-            completionSheet
+            ZStack {
+                completionSheet
+                ConfettiCannon(trigger: $counter5, num: 80, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 300)
+                
+                VStack{
+                    HStack{
+                        ConfettiCannon(trigger: $counter1, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
+                        Spacer()
+                        ConfettiCannon(trigger: $counter2, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
+                    }
+                    Spacer()
+                    HStack{
+                        ConfettiCannon(trigger: $counter3, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
+                        Spacer()
+                        ConfettiCannon(trigger: $counter4, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
+                    }
+                    
+                    
+                }.frame(width: 200, height: 200, alignment: .center)
+            }
+            .interactiveDismissDisabled()
         }
         .alert("Are you sure you want to exit this lesson?", isPresented: $isShowingExitConfirmation) {
             Button("No", role: .cancel) {}
@@ -110,6 +137,20 @@ struct LessonView: View {
             withAnimation { currentIndex += 1 }
         } else {
             isShowingCompletion = true
+            counter1 += 1
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                counter4 += 1
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                counter2 += 1
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                counter3 += 1
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                counter5 += 1
+            }
         }
     }
     
