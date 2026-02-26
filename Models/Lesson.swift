@@ -18,6 +18,76 @@ struct Lesson: Equatable, Identifiable, Hashable {
 extension Lesson {
     nonisolated(unsafe) static let defaultLessons = [
         Lesson(
+            title: "L0 Introduction", subtitle: "What is SQL?",
+            slides: [
+                Slide(kind: .info(Info(
+                    title: "What is a database?",
+                    sections: [
+                        InfoSection(
+                            title: "Think of a spreadsheet",
+                            body: "A database stores information in tables. Tables have rows (records) and columns (fields)."
+                        ),
+                        InfoSection(
+                            title: "Tables you can ask questions about",
+                            body: "SQL is the language you use to ask questions like ‘Which pets are older than 3?’"
+                        )
+                    ]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Meet our example data",
+                    sections: [
+                        InfoSection(
+                            title: "Animals table",
+                            body: "Animals(id, name, species, age)\n\n1 | Luna | cat | 2\n2 | Max | dog | 5\n3 | Kiwi | bird | 1\n4 | Nova | cat | 4"
+                        ),
+                        InfoSection(
+                            title: "Owners table",
+                            body: "Owners(id, name, city)\n\n1 | Alex | London\n2 | Priya | Tokyo\n3 | Sam | Toronto"
+                        )
+                    ]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "What is SQL?",
+                    sections: [
+                        InfoSection(
+                            title: "A question language",
+                            body: "SQL (Structured Query Language) lets you read and change data stored in tables."
+                        ),
+                        InfoSection(
+                            title: "Start with SELECT",
+                            body: "Most queries start with SELECT and tell the database what columns and table to read from."
+                        )
+                    ]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "The basic pattern",
+                    sections: [
+                        InfoSection(
+                            title: "SELECT → FROM → WHERE → ORDER BY",
+                            body: "SELECT chooses columns. FROM picks the table. WHERE filters rows. ORDER BY sorts the result."
+                        ),
+                        InfoSection(
+                            title: "Example",
+                            body: "SELECT name, age FROM Animals WHERE age > 3 ORDER BY age DESC"
+                        )
+                    ]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "How to read results",
+                    sections: [
+                        InfoSection(
+                            title: "A result is a new table",
+                            body: "Every SQL query returns a table. Sometimes it has fewer rows (filtered), sometimes fewer columns (selected)."
+                        ),
+                        InfoSection(
+                            title: "You’re ready",
+                            body: "Next, you’ll build your first SELECT queries using blocks."
+                        )
+                    ]
+                )))
+            ]
+        ),
+        Lesson(
             title: "L1 Select Basics", subtitle: "SELECT / FROM",
             slides: [
                 Slide(kind: .info(Info(

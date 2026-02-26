@@ -19,7 +19,7 @@ struct InfoView: View {
     }
     
     var body: some View {
-        ScrollView {
+        //        ScrollView {
             VStack(spacing: 16) {
                 Text(info.title)
                     .font(.title)
@@ -41,7 +41,7 @@ struct InfoView: View {
                 
                 Spacer(minLength: 24)
             }
-        }
+        //        }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 if #available(iOS 26.0, *) {
