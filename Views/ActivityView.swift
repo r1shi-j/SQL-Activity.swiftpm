@@ -134,6 +134,7 @@ struct ActivityView: View {
                         .padding(8)
                         .buttonStyle(.glassProminent)
                         .tint(color)
+                        .keyboardShortcut(.return, modifiers: [])
                 } else {
                     Button(title, action: action)
                         .font(.title)
@@ -142,6 +143,7 @@ struct ActivityView: View {
                         .clipShape(.capsule)
                         .padding()
                         .tint(.primary)
+                        .keyboardShortcut(.return, modifiers: [])
                 }
             }
         }
@@ -382,6 +384,37 @@ struct ActivityView: View {
             .onTapGesture(perform: action)
     }
     
+    private func normalizeSQL(_ input: String) -> String {
+        let padded = input
+            .replacingOccurrences(of: ",", with: " , ")
+            .replacingOccurrences(of: "(", with: "( ")
+            .replacingOccurrences(of: ")", with: " )")
+        return padded
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+    
+    private func formatTokens(_ tokens: [String]) -> String {
+        var result = ""
+        for token in tokens {
+            if result.isEmpty {
+                result = token
+                continue
+            }
+            if token == "," || token == ")" || token == ";" {
+                result += token
+                continue
+            }
+            if result.last == "(" {
+                result += token
+                continue
+            }
+            result += " " + token
+        }
+        return result
+    }
+    
     private func reorderGesture(for block: Block) -> some Gesture {
         LongPressGesture(minimumDuration: 0.2)
             .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .named("UsedBlocks")))
@@ -494,15 +527,20 @@ struct ActivityView: View {
     }
     
     private func verifyAnswer() {
-        let candidate = answerMode == .text
-            ? textAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
-            : usedBlocks.map(\.content).joined(separator: " ")
+        let rawCandidate: String
+        if answerMode == .text {
+            rawCandidate = textAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            rawCandidate = formatTokens(usedBlocks.map(\.content))
+        }
+        let candidate = normalizeSQL(rawCandidate)
+        let expected = normalizeSQL(activity.answer)
         
         withAnimation {
-            let isCorrect = candidate == activity.answer
+            let isCorrect = candidate == expected
             session.wasCorrect = isCorrect
             if isCorrect {
-                session.completedAnswer = candidate
+                session.completedAnswer = rawCandidate
                 session.completedMode = answerMode.rawValue
             }
         }
