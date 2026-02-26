@@ -42,9 +42,6 @@ struct InfoView: View {
                 Spacer(minLength: 24)
             }
         }
-        .background {
-            Color.orange.opacity(0.2).ignoresSafeArea()
-        }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 if #available(iOS 26.0, *) {

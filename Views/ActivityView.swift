@@ -84,16 +84,7 @@ struct ActivityView: View {
             
             Spacer()
         }
-        .disabled(session.wasCorrect != nil)
-        .disabled(session.hasBeenCompleted)
-        .background {
-            switch session.wasCorrect {
-                case nil: Color.blue.opacity(0.2).ignoresSafeArea()
-                case true: Color.green.opacity(0.2).ignoresSafeArea()
-                case false: Color.red.opacity(0.2).ignoresSafeArea()
-                case .some(_): Color.clear
-            }
-        }
+        .disabled(session.wasCorrect != nil || session.hasBeenCompleted)
         .toolbar {
             if !session.hasBeenCompleted {
                 ToolbarItem(placement: .destructiveAction) {
@@ -104,7 +95,7 @@ struct ActivityView: View {
                 if activity.hint != nil {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
-                            .tint(.yellow)
+                            .tint(AppTheme.hintTint)
                             .disabled(session.wasCorrect != nil)
                     }
                 }
@@ -166,7 +157,7 @@ struct ActivityView: View {
                 
                 HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
                     ForEach(availableBlocks, id: \.id) { block in
-                        blockButton(block, color: .red.opacity(0.4)) {
+                        blockButton(block, color: AppTheme.availableBlockTint) {
                             addBlock(block)
                         }
                     }
@@ -203,7 +194,7 @@ struct ActivityView: View {
     
     private func usedBlockView(_ block: Block) -> some View {
         HStack(spacing: 6) {
-            blockButton(block, color: .green.opacity(0.4)) {
+            blockButton(block, color: AppTheme.usedBlockTint) {
                 removeBlock(block)
             }
             

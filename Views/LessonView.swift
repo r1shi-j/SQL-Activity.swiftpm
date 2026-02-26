@@ -52,6 +52,7 @@ struct LessonView: View {
                 ContentUnavailableView("No content", systemImage: "rectangle.on.rectangle.slash", description: Text("There appears to be no content here. Try again later."))
             }
         }
+        .background(currentBackground.ignoresSafeArea())
         .navigationTitle(lesson.title)
 //        .navigationSubtitle(lesson.subtitle ?? "")
         .navigationBarTitleDisplayMode(.inline)
@@ -106,6 +107,56 @@ struct LessonView: View {
             withAnimation { currentIndex -= 1 }
         }
     }
+    
+private var lessonProgressHeader: some View {
+    ProgressView(value: Double(currentIndex + 1), total: Double(max(lesson.slides.count, 1)))
+        .tint(.blue)
+        .padding(.horizontal)
+}
+    
+    private var currentBackground: Color {
+        guard lesson.slides.indices.contains(currentIndex) else { return AppTheme.activityBackground }
+        switch lesson.slides[currentIndex].kind {
+            case .activity:
+                switch lesson.slides[currentIndex].activitySession.wasCorrect {
+                    case nil: return AppTheme.activityBackground
+                    case true: return AppTheme.successBackground
+                    case false: return AppTheme.errorBackground
+                    case .some(_): return AppTheme.activityBackground
+                }
+            case .info:
+                return AppTheme.infoBackground
+        }
+    }
+    
+private var completionSheet: some View {
+    NavigationStack {
+        VStack(spacing: 16) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.green)
+            Text("Lesson Complete")
+                .font(.title2)
+            Text("Nice work! You finished \(lesson.title).")
+                .foregroundStyle(.secondary)
+            if #available(iOS 26.0, *) {
+                Button("Back to Lessons") {
+                    isShowingCompletion = false
+                    goHome(true)
+                }
+                .buttonStyle(.glassProminent)
+            } else {
+                Button("Back to Lessons") {
+                    isShowingCompletion = false
+                    goHome(true)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding()
+        .navigationTitle(lesson.title)
+    }
+}
     
     private func toggleExitConfirmation() {
         if lesson.isComplete == true {
