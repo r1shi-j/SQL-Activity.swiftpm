@@ -30,6 +30,7 @@ Think of the app like a restaurant:
 - Gotcha: answer validation is strict string matching. Every block token and space matters, so answers must mirror the block list exactly.
 - Replaced the old HomeView lesson list with the new map UI prototype and connected it to real `Lesson` data. War story: the prototype looked done but was fully fake, so the real work was wiring status logic (`completed/current/locked`) and preserving existing `LessonView` navigation callbacks.
 - Portrait-mode cleanup: the lesson cards were drifting into the center divider because spacer math was too loose. Fix was to treat each row like two strict half-columns with a fixed center node, then use weighted spacing (`4:1`) inside the active half so cards keep a consistent gap from the divider.
+- Added a real Settings sheet from Home (gear icon) with three controls: accent color, unlock-all-lessons toggle, and default answer method. Gotcha: default answer mode had to be threaded through `HomeView -> LessonView -> ActivityView` so it affects new activity attempts without breaking completed session restores.
 
 ## Engineer's Wisdom
 - Small models + clear view composition beats giant view controllers.

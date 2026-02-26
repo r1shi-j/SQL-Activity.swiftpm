@@ -9,6 +9,8 @@ import SwiftUI
 
 struct LessonMapView: View {
     let lessons: [Lesson]
+    let unlockAllLessons: Bool
+    let accentColor: Color
     let onSelectLesson: (Lesson) -> Void
 
     struct MapLesson: Identifiable {
@@ -36,9 +38,9 @@ struct LessonMapView: View {
 
         return lessons.enumerated().map { index, lesson in
             let status: Status
-            if lesson.isComplete || index < firstIncompleteIndex {
+            if lesson.isComplete {
                 status = .completed
-            } else if index == firstIncompleteIndex {
+            } else if unlockAllLessons || index == firstIncompleteIndex {
                 status = .current
             } else {
                 status = .locked
@@ -61,7 +63,7 @@ struct LessonMapView: View {
                 Text("Your SQL Journey")
                     .font(.largeTitle)
                     .fontWidth(.expanded)
-                    .fontWeight(.bold)
+                    .bold()
                     .padding(.top, 50)
 
                 ZStack(alignment: .top) {
@@ -69,7 +71,7 @@ struct LessonMapView: View {
 
                     VStack(spacing: 36) {
                         ForEach(mapLessons) { lesson in
-                            LessonNodeView(lesson: lesson) {
+                            LessonNodeView(lesson: lesson, accentColor: accentColor) {
                                 onSelectLesson(lesson.lesson)
                             }
                         }
@@ -85,6 +87,7 @@ struct LessonMapView: View {
 
 private struct LessonNodeView: View {
     let lesson: LessonMapView.MapLesson
+    let accentColor: Color
     let action: () -> Void
 
     var body: some View {
@@ -95,13 +98,13 @@ private struct LessonNodeView: View {
                     Spacer(minLength: 0)
                     Spacer(minLength: 0)
                     Spacer(minLength: 0)
-                    LessonCard(lesson: lesson, action: action)
+                    LessonCard(lesson: lesson, accentColor: accentColor, action: action)
                         .frame(maxWidth: 220)
                     Spacer(minLength: 0)
                 }
                 .frame(maxWidth: .infinity)
 
-                NodeIndicator(status: lesson.status)
+                NodeIndicator(status: lesson.status, accentColor: accentColor)
                     .frame(width: 40)
 
                 Color.clear
@@ -110,12 +113,12 @@ private struct LessonNodeView: View {
                 Color.clear
                     .frame(maxWidth: .infinity)
 
-                NodeIndicator(status: lesson.status)
+                NodeIndicator(status: lesson.status, accentColor: accentColor)
                     .frame(width: 40)
 
                 HStack(spacing: 0) {
                     Spacer(minLength: 0)
-                    LessonCard(lesson: lesson, action: action)
+                    LessonCard(lesson: lesson, accentColor: accentColor, action: action)
                         .frame(maxWidth: 220)
                     Spacer(minLength: 0)
                     Spacer(minLength: 0)
@@ -130,6 +133,7 @@ private struct LessonNodeView: View {
 
 private struct LessonCard: View {
     let lesson: LessonMapView.MapLesson
+    let accentColor: Color
     let action: () -> Void
 
     var body: some View {
@@ -160,7 +164,7 @@ private struct LessonCard: View {
         case .completed:
             return .green.opacity(0.12)
         case .current:
-            return .blue.opacity(0.12)
+            return accentColor.opacity(0.12)
         case .locked:
             return .gray.opacity(0.08)
         }
@@ -171,7 +175,7 @@ private struct LessonCard: View {
         case .completed:
             return .green
         case .current:
-            return .blue
+            return accentColor
         case .locked:
             return .gray
         }
@@ -180,6 +184,7 @@ private struct LessonCard: View {
 
 private struct NodeIndicator: View {
     let status: LessonMapView.Status
+    let accentColor: Color
 
     var body: some View {
         ZStack {
@@ -192,7 +197,7 @@ private struct NodeIndicator: View {
                     .foregroundStyle(.white)
             } else if status == .current {
                 Circle()
-                    .strokeBorder(.blue, lineWidth: 2)
+                    .strokeBorder(accentColor, lineWidth: 2)
                     .frame(width: 30, height: 30)
             }
         }
@@ -203,7 +208,7 @@ private struct NodeIndicator: View {
         case .completed:
             return .green
         case .current:
-            return .blue
+            return accentColor
         case .locked:
             return .gray
         }

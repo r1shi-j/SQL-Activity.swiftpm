@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LessonView: View {
     @Binding var lesson: Lesson
+    let defaultAnswerMode: AnswerMode
     let goHome: (Bool) -> Void
     
     @State private var currentIndex = 0
@@ -23,10 +24,11 @@ struct LessonView: View {
     @State private var counter4 = 1
     @State private var counter5 = 1
     
-    init(lesson: Binding<Lesson>, goHome: @escaping (Bool) -> Void) {
+    init(lesson: Binding<Lesson>, defaultAnswerMode: AnswerMode, goHome: @escaping (Bool) -> Void) {
         _lesson = lesson
+        self.defaultAnswerMode = defaultAnswerMode
         self.goHome = goHome
-        
+
         isShowingAlreadyCompletedAlert = _lesson.wrappedValue.isComplete
     }
     
@@ -42,6 +44,7 @@ struct LessonView: View {
                             ActivityView(
                                 activity: activity,
                                 session: lesson.slides[currentIndex].activitySession,
+                                defaultAnswerMode: defaultAnswerMode,
                                 isLast: currentIndex + 1 == lesson.slides.count
                             ) {
                                 lesson.slides[currentIndex].isComplete = true
