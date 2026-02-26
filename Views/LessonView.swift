@@ -7,25 +7,26 @@
 
 import SwiftUI
 
-//enum ActivityRoute {
-//    case next
-//    case home
-//}
-
 struct LessonView: View {
     @Binding var lesson: Lesson
-    let goHome: (Bool/*ActivityRoute*/) -> Void
+    let goHome: (Bool) -> Void
     
     @State private var currentIndex = 0
     @State private var isShowingExitConfirmation = false
+    @State private var isShowingCompletion = false
+    @State private var isShowingAlreadyCompletedAlert: Bool
     
-    init(lesson: Binding<Lesson>, goHome: @escaping (Bool/*ActivityRoute*/) -> Void) {
+    init(lesson: Binding<Lesson>, goHome: @escaping (Bool) -> Void) {
         _lesson = lesson
         self.goHome = goHome
+        
+        isShowingAlreadyCompletedAlert = _lesson.wrappedValue.isComplete
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
+            lessonProgressHeader
+            
             if lesson.slides.indices.contains(currentIndex) {
                 let slide = lesson.slides[currentIndex]
                 Group {
@@ -83,6 +84,9 @@ struct LessonView: View {
                 }
             }
         }
+        .sheet(isPresented: $isShowingCompletion) {
+            completionSheet
+        }
         .alert("Are you sure you want to exit this lesson?", isPresented: $isShowingExitConfirmation) {
             Button("No", role: .cancel) {}
             Button("Yes", role: .destructive) {
@@ -92,13 +96,20 @@ struct LessonView: View {
         } message: {
             Text("Your progress will be lost.")
         }
+        .alert("You have already completed this lesson!", isPresented: $isShowingAlreadyCompletedAlert) {
+            Button("Redo Lesson", role: .destructive, action: resetLesson)
+            Button("Observe Lesson") { }
+            Button("Return Home", role: .cancel) { goHome(true) }
+        } message: {
+            Text("Redoing the lesson will clear your progress.\nObserve the lesson to see the answers.")
+        }
     }
     
     private func advance() {
         if currentIndex + 1 < lesson.slides.count {
             withAnimation { currentIndex += 1 }
         } else {
-            goHome(true)
+            isShowingCompletion = true
         }
     }
     
@@ -108,11 +119,11 @@ struct LessonView: View {
         }
     }
     
-private var lessonProgressHeader: some View {
-    ProgressView(value: Double(currentIndex + 1), total: Double(max(lesson.slides.count, 1)))
-        .tint(.blue)
-        .padding(.horizontal)
-}
+    private var lessonProgressHeader: some View {
+        ProgressView(value: Double(currentIndex + 1), total: Double(max(lesson.slides.count, 1)))
+            .tint(.blue)
+            .padding(.horizontal)
+    }
     
     private var currentBackground: Color {
         guard lesson.slides.indices.contains(currentIndex) else { return AppTheme.activityBackground }
@@ -129,34 +140,34 @@ private var lessonProgressHeader: some View {
         }
     }
     
-private var completionSheet: some View {
-    NavigationStack {
-        VStack(spacing: 16) {
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(.green)
-            Text("Lesson Complete")
-                .font(.title2)
-            Text("Nice work! You finished \(lesson.title).")
-                .foregroundStyle(.secondary)
-            if #available(iOS 26.0, *) {
-                Button("Back to Lessons") {
-                    isShowingCompletion = false
-                    goHome(true)
+    private var completionSheet: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.green)
+                Text("Lesson Complete")
+                    .font(.title2)
+                Text("Nice work! You finished \(lesson.title).")
+                    .foregroundStyle(.secondary)
+                if #available(iOS 26.0, *) {
+                    Button("Back to Lessons") {
+                        isShowingCompletion = false
+                        goHome(true)
+                    }
+                    .buttonStyle(.glassProminent)
+                } else {
+                    Button("Back to Lessons") {
+                        isShowingCompletion = false
+                        goHome(true)
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                .buttonStyle(.glassProminent)
-            } else {
-                Button("Back to Lessons") {
-                    isShowingCompletion = false
-                    goHome(true)
-                }
-                .buttonStyle(.borderedProminent)
             }
+            .padding()
+            .navigationTitle(lesson.title)
         }
-        .padding()
-        .navigationTitle(lesson.title)
     }
-}
     
     private func toggleExitConfirmation() {
         if lesson.isComplete == true {
@@ -171,7 +182,10 @@ private var completionSheet: some View {
             $0.activitySession.usedIndices.removeAll()
             $0.activitySession.wasCorrect = nil
             $0.activitySession.hasBeenCompleted = false
+            $0.activitySession.completedAnswer = nil
+            $0.activitySession.completedMode = nil
         }
+        lesson.isComplete = false
     }
 }
 

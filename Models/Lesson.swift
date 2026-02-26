@@ -180,7 +180,7 @@ extension Lesson {
                     hint: "Use GROUP BY species.",
                     schema: "Animals(id, name, species, age)",
                     answer: "SELECT species , COUNT ( * ) FROM Animals GROUP BY species",
-                    blocks: ["SELECT", "FROM", "GROUP BY", "COUNT", "(", ")", "*", "species", "Animals", "HAVING", ">", "2", ","]
+                    blocks: ["SELECT", "FROM", "GROUP BY", "COUNT", "(", ")", "*", "species", "species", "Animals", "HAVING", ">", "2", ","]
                 ))),
                 Slide(kind: .activity(Activity(
                     question: "Show species with more than 2 animals.",
@@ -188,7 +188,7 @@ extension Lesson {
                     hint: "Use HAVING COUNT ( * ) > 2.",
                     schema: "Animals(id, name, species, age)",
                     answer: "SELECT species , COUNT ( * ) FROM Animals GROUP BY species HAVING COUNT ( * ) > 2",
-                    blocks: ["SELECT", "FROM", "GROUP BY", "HAVING", "COUNT", "COUNT", "(", ")", "*", "species", "Animals", ">", "2", ","]
+                    blocks: ["SELECT", "FROM", "GROUP BY", "HAVING", "COUNT", "COUNT", "(", "(", ")", ")", "*", "*", "species", "species", "Animals", ">", "2", ","]
                 ))),
                 Slide(kind: .info(Info(
                     title: "You are aggregating now",

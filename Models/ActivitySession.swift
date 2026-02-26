@@ -11,9 +11,11 @@ import Foundation
     var usedIndices: [Int] = []
     var wasCorrect: Bool? = nil
     var hasBeenCompleted: Bool = false
+    var completedAnswer: String? = nil
+    var completedMode: String? = nil
     
     static func == (lhs: ActivitySession, rhs: ActivitySession) -> Bool {
-        lhs.usedIndices == rhs.usedIndices && lhs.wasCorrect == rhs.wasCorrect
+        lhs.usedIndices == rhs.usedIndices && lhs.wasCorrect == rhs.wasCorrect && lhs.completedAnswer == rhs.completedAnswer && lhs.completedMode == rhs.completedMode
     }
     
     func hash(into hasher: inout Hasher) {

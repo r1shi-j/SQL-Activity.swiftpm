@@ -26,11 +26,16 @@ struct ActivityView: View {
     @State private var availableBlocks: [Block]
     @State private var usedBlocks: [Block] = []
     @State private var isShowingHint = false
-    @State private var answerMode: AnswerMode = .blocks
-    @State private var textAnswer = ""
+    @State private var answerMode: AnswerMode
+    @State private var textAnswer: String
     @State private var draggingBlockId: UUID? = nil
     @State private var blockFrames: [UUID: CGRect] = [:]
     @State private var insertionLine: InsertionLine? = nil
+    @State private var isShowingHelp = false
+    @State private var helpPrompt = ""
+    @State private var helpResponse = ""
+    @State private var helpError: String? = nil
+    @State private var isHelpLoading = false
     
     init(activity: Activity, session: ActivitySession, isLast: Bool, onCompletion: @escaping () -> Void) {
         self.activity = activity
@@ -43,6 +48,10 @@ struct ActivityView: View {
         
         let available = activity.initialBlocks.enumerated().filter({ !Set(session.usedIndices).contains($0.offset) }).map({ $0.element })
         self._availableBlocks = State(initialValue: available)
+        
+        let initialMode: AnswerMode = (session.completedMode == AnswerMode.text.rawValue) ? .text : .blocks
+        self._answerMode = State(initialValue: initialMode)
+        self._textAnswer = State(initialValue: session.completedAnswer ?? "")
     }
     
     var body: some View {
@@ -82,8 +91,9 @@ struct ActivityView: View {
                 Text("Your Answer")
                     .font(.headline)
                 Spacer()
+            }
+            .overlay {
                 answerModePicker
-                Spacer()
             }
             .padding()
             
@@ -293,13 +303,15 @@ struct ActivityView: View {
                 removeBlock(block)
             }
             
-            Image(systemName: "line.3.horizontal")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .padding(.trailing, 8)
-                .contentShape(.rect)
-                .gesture(reorderGesture(for: block))
-                .accessibilityLabel("Reorder")
+            if !session.hasBeenCompleted {
+                Image(systemName: "line.3.horizontal")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.trailing, 8)
+                    .contentShape(.rect)
+                    .gesture(reorderGesture(for: block))
+                    .accessibilityLabel("Reorder")
+            }
         }
         .opacity(draggingBlockId == block.id ? 0.6 : 1)
         .animation(.easeInOut(duration: 0.12), value: draggingBlockId)
@@ -470,11 +482,14 @@ struct ActivityView: View {
     }
     
     private func clearUserAnswer() {
-        guard availableBlocks != activity.initialBlocks else { return }
+        guard availableBlocks != activity.initialBlocks || !usedBlocks.isEmpty || !textAnswer.isEmpty else { return }
         withAnimation {
             session.usedIndices.removeAll()
+            session.completedAnswer = nil
+            session.completedMode = nil
             availableBlocks = activity.initialBlocks
             usedBlocks = []
+            textAnswer = ""
         }
     }
     
@@ -484,7 +499,12 @@ struct ActivityView: View {
             : usedBlocks.map(\.content).joined(separator: " ")
         
         withAnimation {
-            session.wasCorrect = candidate == activity.answer
+            let isCorrect = candidate == activity.answer
+            session.wasCorrect = isCorrect
+            if isCorrect {
+                session.completedAnswer = candidate
+                session.completedMode = answerMode.rawValue
+            }
         }
     }
     
@@ -530,6 +550,7 @@ struct ActivityView: View {
         }
     }
 }
+
 private struct InsertionLine: Equatable {
     let x: CGFloat
     let y: CGFloat
@@ -544,4 +565,3 @@ private struct BlockFramePreferenceKey: PreferenceKey {
         value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
-
