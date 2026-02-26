@@ -6,6 +6,7 @@
 //
 
 import Flow
+import FoundationModels
 import SwiftUI
 
 struct ActivityView: View {
@@ -13,6 +14,9 @@ struct ActivityView: View {
         case blocks = "Blocks"
         case text = "Text"
     }
+    
+    @available(iOS 26.0, *)
+    private var model: SystemLanguageModel { SystemLanguageModel.default }
     
     let activity: Activity
     var session: ActivitySession
@@ -64,6 +68,13 @@ struct ActivityView: View {
                 }
                 .padding(.horizontal)
             }
+            
+            HStack {
+                Spacer()
+                Button("Ask for help", systemImage: "sparkles", action: openHelp)
+                    .buttonStyle(.bordered)
+            }
+            .padding(.horizontal)
             
             Spacer()
             
@@ -124,6 +135,9 @@ struct ActivityView: View {
                 }
             }
         }
+        .sheet(isPresented: $isShowingHelp) {
+            helpSheet
+        }
         .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
         .onChange(of: answerMode) { oldValue, newValue in
             if newValue == .text {
@@ -140,6 +154,87 @@ struct ActivityView: View {
         }
         .pickerStyle(.segmented)
         .frame(width: 320)
+    }
+    
+    private var helpSheet: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                if #available(iOS 26.0, *) {
+                    helpAvailabilityView
+                } else {
+                    Text("Apple Intelligence requires iOS 26 or later.")
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Ask for help")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        isShowingHelp = false
+                    }
+                }
+            }
+        }
+    }
+    
+    @available(iOS 26.0, *)
+    @ViewBuilder
+    private var helpAvailabilityView: some View {
+        switch model.availability {
+            case .available:
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Prompt")
+                        .font(.headline)
+                    TextEditor(text: $helpPrompt)
+                        .font(.system(.body, design: .monospaced))
+                        .frame(minHeight: 140)
+                        .padding(8)
+                        .background(.white.opacity(0.8))
+                        .clipShape(.rect(cornerRadius: 12))
+                    
+                    Button(isHelpLoading ? "Asking…" : "Ask") {
+                        Task { await requestHelp() }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(isHelpLoading || helpPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .onAppear {
+                        helpPrompt = defaultHelpPrompt()
+                    }
+                    
+                    if isHelpLoading {
+                        ProgressView()
+                    }
+                    
+                    if let helpError {
+                        Text(helpError)
+                            .foregroundStyle(.red)
+                    }
+                    
+                    if !helpResponse.isEmpty {
+                        Text("Response")
+                            .font(.headline)
+                        ScrollView {
+                            Text(helpResponse)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .frame(minHeight: 160)
+                    }
+                }
+            case .unavailable(.deviceNotEligible):
+                Text("This device doesn’t support Apple Intelligence.")
+                    .foregroundStyle(.secondary)
+            case .unavailable(.appleIntelligenceNotEnabled):
+                Text("Turn on Apple Intelligence in Settings to use help.")
+                    .foregroundStyle(.secondary)
+            case .unavailable(.modelNotReady):
+                Text("The on-device model is still downloading. Try again soon.")
+                    .foregroundStyle(.secondary)
+            case .unavailable:
+                Text("Apple Intelligence is unavailable right now.")
+                    .foregroundStyle(.secondary)
+        }
     }
     
     private var blocksAnswerSection: some View {
@@ -218,6 +313,53 @@ struct ActivityView: View {
             .background(.white.opacity(0.8))
             .clipShape(.rect(cornerRadius: 12))
             .padding(.horizontal)
+    }
+    
+    private func openHelp() {
+        helpError = nil
+        helpResponse = ""
+        isHelpLoading = false
+        isShowingHelp = true
+    }
+    
+    private func defaultHelpPrompt() -> String {
+        var prompt = "You are a SQL tutor. Give hints only; do not provide the full final query.\n"
+        prompt += "Question: \(activity.question)\n"
+        if let schema = activity.schema {
+            prompt += "Schema:\n\(schema)\n"
+        }
+        let currentAnswer = answerMode == .text
+            ? textAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
+            : usedBlocks.map(\.content).joined(separator: " ")
+        if !currentAnswer.isEmpty {
+            prompt += "My current attempt: \(currentAnswer)\n"
+        }
+        prompt += "Explain the next steps and common pitfalls."
+        return prompt
+    }
+    
+    @available(iOS 26.0, *)
+    @MainActor
+    private func requestHelp() async {
+        guard model.availability == .available else {
+            helpError = "Apple Intelligence is unavailable on this device right now."
+            return
+        }
+        guard !isHelpLoading else { return }
+        
+        isHelpLoading = true
+        helpError = nil
+        helpResponse = ""
+        
+        let instructions = "You are a friendly SQL tutor. Provide hints and reasoning, but do not give the full final query."
+        let session = LanguageModelSession(model: model, instructions: instructions)
+        do {
+            let response = try await session.respond(to: helpPrompt)
+            helpResponse = response.content
+        } catch {
+            helpError = error.localizedDescription
+        }
+        isHelpLoading = false
     }
     
     private func blockButton(_ block: Block, color: Color, action: @escaping () -> Void) -> some View {
