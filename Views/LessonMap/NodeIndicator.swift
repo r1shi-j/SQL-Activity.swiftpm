@@ -3,7 +3,7 @@ import SwiftUI
 struct NodeIndicator: View {
     let status: LessonMapView.Status
     let accentColor: Color
-
+    
     var body: some View {
         ZStack {
             Circle()
@@ -21,15 +21,15 @@ struct NodeIndicator: View {
             }
         }
     }
-
+    
     private var nodeFill: Color {
         switch status {
-        case .completed:
-            return .green
-        case .current:
-            return accentColor
-        case .locked:
-            return .gray
+            case .completed:
+                return .green
+            case .current:
+                return accentColor
+            case .locked:
+                return .gray
         }
     }
 }

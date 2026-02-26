@@ -4,7 +4,7 @@ struct LessonCard: View {
     let lesson: LessonMapView.MapLesson
     let accentColor: Color
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 6) {
@@ -27,26 +27,26 @@ struct LessonCard: View {
         .opacity(lesson.status == .locked ? 0.6 : 1)
         .disabled(lesson.status == .locked)
     }
-
+    
     private var cardBackground: Color {
         switch lesson.status {
-        case .completed:
-            return .green.opacity(0.12)
-        case .current:
-            return accentColor.opacity(0.12)
-        case .locked:
-            return .gray.opacity(0.08)
+            case .completed:
+                return .green.opacity(0.12)
+            case .current:
+                return accentColor.opacity(0.12)
+            case .locked:
+                return .gray.opacity(0.08)
         }
     }
-
+    
     private var borderColor: Color {
         switch lesson.status {
-        case .completed:
-            return .green
-        case .current:
-            return accentColor
-        case .locked:
-            return .gray
+            case .completed:
+                return .green
+            case .current:
+                return accentColor
+            case .locked:
+                return .gray
         }
     }
 }

@@ -4,19 +4,19 @@ struct HomeView: View {
     @State private var lessons: [Lesson] = Lesson.defaultLessons
     @State private var path = NavigationPath()
     @State private var isShowingSettings = false
-
+    
     @AppStorage("settings.accentColor") private var accentColorRawValue = AccentColorOption.indigo.rawValue
     @AppStorage("settings.unlockAllLessons") private var unlockAllLessons = false
     @AppStorage("settings.defaultAnswerMode") private var defaultAnswerModeRawValue = AnswerMode.blocks.rawValue
-
+    
     private var accentColorOption: AccentColorOption {
         AccentColorOption(rawValue: accentColorRawValue) ?? .indigo
     }
-
+    
     private var defaultAnswerMode: AnswerMode {
         AnswerMode(rawValue: defaultAnswerModeRawValue) ?? .blocks
     }
-
+    
     var body: some View {
         NavigationStack(path: $path) {
             LessonMapView(
@@ -59,7 +59,7 @@ struct HomeView: View {
             }
         }
     }
-
+    
     private func handleFinish(for lesson: Lesson, success: Bool) {
         guard let currentIndex = lessons.firstIndex(where: { $0.id == lesson.id }) else { return }
         lessons[currentIndex].isComplete = success

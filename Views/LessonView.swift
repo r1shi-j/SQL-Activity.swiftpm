@@ -29,7 +29,7 @@ struct LessonView: View {
         self.defaultAnswerMode = defaultAnswerMode
         self.accentColor = accentColor
         self.goHome = goHome
-
+        
         isShowingAlreadyCompletedAlert = _lesson.wrappedValue.isComplete
     }
     
@@ -183,7 +183,7 @@ struct LessonView: View {
         isShowingCompletion = false
         goHome(true)
     }
-
+    
     private func toggleExitConfirmation() {
         if lesson.isComplete == true {
             goHome(true)

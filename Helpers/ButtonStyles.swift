@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GlassBlockButtonStyle: ButtonStyle {
     var color: Color
-
+    
     func makeBody(configuration: Configuration) -> some View {
         if #available(iOS 26.0, *) {
             configuration.label

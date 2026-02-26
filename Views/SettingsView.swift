@@ -4,9 +4,9 @@ struct SettingsView: View {
     @Binding var accentColorRawValue: String
     @Binding var unlockAllLessons: Bool
     @Binding var defaultAnswerModeRawValue: String
-
+    
     @Environment(\.dismiss) private var dismiss
-
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -23,11 +23,11 @@ struct SettingsView: View {
                         }
                     }
                 }
-
+                
                 Section("Progress") {
                     Toggle("Unlock all lessons", isOn: $unlockAllLessons)
                 }
-
+                
                 Section("Answers") {
                     Picker("Default method", selection: $defaultAnswerModeRawValue) {
                         ForEach(AnswerMode.allCases) { mode in

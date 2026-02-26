@@ -5,7 +5,7 @@ struct LessonMapView: View {
     let unlockAllLessons: Bool
     let accentColor: Color
     let onSelectLesson: (Lesson) -> Void
-
+    
     struct MapLesson: Identifiable {
         let id: UUID
         let title: String
@@ -14,21 +14,21 @@ struct LessonMapView: View {
         let side: Side
         let lesson: Lesson
     }
-
+    
     enum Status {
         case completed
         case current
         case locked
     }
-
+    
     enum Side {
         case left
         case right
     }
-
+    
     private var mapLessons: [MapLesson] {
         let firstIncompleteIndex = lessons.firstIndex(where: { !$0.isComplete }) ?? lessons.count
-
+        
         return lessons.enumerated().map { index, lesson in
             let status: Status
             if lesson.isComplete {
@@ -38,7 +38,7 @@ struct LessonMapView: View {
             } else {
                 status = .locked
             }
-
+            
             return MapLesson(
                 id: lesson.id,
                 title: lesson.title,
@@ -49,7 +49,7 @@ struct LessonMapView: View {
             )
         }
     }
-
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 32) {
@@ -58,10 +58,10 @@ struct LessonMapView: View {
                     .fontWidth(.expanded)
                     .bold()
                     .padding(.top, 50)
-
+                
                 ZStack(alignment: .top) {
                     PathLine()
-
+                    
                     VStack(spacing: 36) {
                         ForEach(mapLessons) { lesson in
                             LessonNodeView(lesson: lesson, accentColor: accentColor) {

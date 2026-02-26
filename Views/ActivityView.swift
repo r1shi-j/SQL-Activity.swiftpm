@@ -362,8 +362,8 @@ struct ActivityView: View {
             prompt += "Schema:\n\(schema)\n"
         }
         let currentAnswer = answerMode == .text
-            ? textAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
-            : usedBlocks.map(\.content).joined(separator: " ")
+        ? textAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
+        : usedBlocks.map(\.content).joined(separator: " ")
         if !currentAnswer.isEmpty {
             prompt += "My current attempt: \(currentAnswer)\n"
         }

@@ -4,13 +4,13 @@ import SwiftUI
 struct LessonCompletionSheet: View {
     let lessonTitle: String
     let onBackToLessons: () -> Void
-
+    
     @Binding var centerCounter: Int
     @Binding var topLeftCounter: Int
     @Binding var topRightCounter: Int
     @Binding var bottomLeftCounter: Int
     @Binding var bottomRightCounter: Int
-
+    
     var body: some View {
         ZStack {
             completionContent
@@ -22,7 +22,7 @@ struct LessonCompletionSheet: View {
                 closingAngle: .degrees(360),
                 radius: 300
             )
-
+            
             VStack {
                 HStack {
                     ConfettiCannon(
@@ -67,20 +67,20 @@ struct LessonCompletionSheet: View {
             .frame(width: 200, height: 200, alignment: .center)
         }
     }
-
+    
     private var completionContent: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 Image(systemName: "checkmark.seal.fill")
                     .font(.system(size: 48))
                     .foregroundStyle(.green)
-
+                
                 Text("Lesson Complete")
                     .font(.title2)
-
+                
                 Text("Nice work! You finished \(lessonTitle).")
                     .foregroundStyle(.secondary)
-
+                
                 if #available(iOS 26.0, *) {
                     Button("Back to Lessons", action: onBackToLessons)
                         .buttonStyle(.glassProminent)
