@@ -5,12 +5,12 @@
 //  Created by Rishi Jansari on 12/02/2026.
 //
 
-import ConfettiSwiftUI
 import SwiftUI
 
 struct LessonView: View {
     @Binding var lesson: Lesson
     let defaultAnswerMode: AnswerMode
+    let accentColor: Color
     let goHome: (Bool) -> Void
     
     @State private var currentIndex = 0
@@ -24,9 +24,10 @@ struct LessonView: View {
     @State private var counter4 = 1
     @State private var counter5 = 1
     
-    init(lesson: Binding<Lesson>, defaultAnswerMode: AnswerMode, goHome: @escaping (Bool) -> Void) {
+    init(lesson: Binding<Lesson>, defaultAnswerMode: AnswerMode, accentColor: Color, goHome: @escaping (Bool) -> Void) {
         _lesson = lesson
         self.defaultAnswerMode = defaultAnswerMode
+        self.accentColor = accentColor
         self.goHome = goHome
 
         isShowingAlreadyCompletedAlert = _lesson.wrappedValue.isComplete
@@ -45,6 +46,7 @@ struct LessonView: View {
                                 activity: activity,
                                 session: lesson.slides[currentIndex].activitySession,
                                 defaultAnswerMode: defaultAnswerMode,
+                                accentColor: accentColor,
                                 isLast: currentIndex + 1 == lesson.slides.count
                             ) {
                                 lesson.slides[currentIndex].isComplete = true
@@ -80,7 +82,7 @@ struct LessonView: View {
                                 .font(.title)
                                 .padding(8)
                                 .buttonStyle(.glassProminent)
-                                .tint(.indigo)
+                                .tint(accentColor)
                         } else {
                             Button("Back", action: goBack)
                                 .font(.title)
@@ -88,37 +90,29 @@ struct LessonView: View {
                                 .background(.indigo)
                                 .clipShape(.capsule)
                                 .padding()
-                                .tint(.primary)
+                                .tint(accentColor)
                         }
                     }
                 }
             }
         }
         .sheet(isPresented: $isShowingCompletion) {
-            ZStack {
-                completionSheet
-                ConfettiCannon(trigger: $counter5, num: 80, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 300)
-                
-                VStack{
-                    HStack{
-                        ConfettiCannon(trigger: $counter1, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
-                        Spacer()
-                        ConfettiCannon(trigger: $counter2, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
-                    }
-                    Spacer()
-                    HStack{
-                        ConfettiCannon(trigger: $counter3, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
-                        Spacer()
-                        ConfettiCannon(trigger: $counter4, num: 20, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
-                    }
-                    
-                    
-                }.frame(width: 200, height: 200, alignment: .center)
-            }
+            LessonCompletionSheet(
+                lessonTitle: lesson.title,
+                onBackToLessons: returnToLessons,
+                centerCounter: $counter5,
+                topLeftCounter: $counter1,
+                topRightCounter: $counter2,
+                bottomLeftCounter: $counter3,
+                bottomRightCounter: $counter4
+            )
+            .tint(accentColor)
             .interactiveDismissDisabled()
         }
+        .tint(.primary)
         .alert("Are you sure you want to exit this lesson?", isPresented: $isShowingExitConfirmation) {
             Button("No", role: .cancel) {}
+                .tint(.primary)
             Button("Yes", role: .destructive) {
                 resetLesson()
                 goHome(false)
@@ -130,6 +124,7 @@ struct LessonView: View {
             Button("Redo Lesson", role: .destructive, action: resetLesson)
             Button("Observe Lesson") { }
             Button("Return Home", role: .cancel) { goHome(true) }
+                .tint(.primary)
         } message: {
             Text("Redoing the lesson will clear your progress.\nObserve the lesson to see the answers.")
         }
@@ -184,35 +179,11 @@ struct LessonView: View {
         }
     }
     
-    private var completionSheet: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.green)
-                Text("Lesson Complete")
-                    .font(.title2)
-                Text("Nice work! You finished \(lesson.title).")
-                    .foregroundStyle(.secondary)
-                if #available(iOS 26.0, *) {
-                    Button("Back to Lessons") {
-                        isShowingCompletion = false
-                        goHome(true)
-                    }
-                    .buttonStyle(.glassProminent)
-                } else {
-                    Button("Back to Lessons") {
-                        isShowingCompletion = false
-                        goHome(true)
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-            }
-            .padding()
-            .navigationTitle(lesson.title)
-        }
+    private func returnToLessons() {
+        isShowingCompletion = false
+        goHome(true)
     }
-    
+
     private func toggleExitConfirmation() {
         if lesson.isComplete == true {
             goHome(true)

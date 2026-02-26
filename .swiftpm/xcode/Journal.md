@@ -15,6 +15,8 @@ Think of the app like a restaurant:
 - `Views/`: UI screens (Home, Lesson, Info, Activity).
 - `Models/`: Lesson/Slide/Activity/Info/Block and session state.
 - `Helpers/`: button styles and UI polish.
+- `Views/LessonMap/`: lesson-map feature views split by responsibility (map shell, node row, card, indicator, divider).
+- `Views/Lesson/`: lesson-specific supporting UI such as completion-sheet content.
 
 ## Tech Stack & Why
 - **SwiftUI**: fast iteration, great for rich, animated iPad layouts.
@@ -31,6 +33,9 @@ Think of the app like a restaurant:
 - Replaced the old HomeView lesson list with the new map UI prototype and connected it to real `Lesson` data. War story: the prototype looked done but was fully fake, so the real work was wiring status logic (`completed/current/locked`) and preserving existing `LessonView` navigation callbacks.
 - Portrait-mode cleanup: the lesson cards were drifting into the center divider because spacer math was too loose. Fix was to treat each row like two strict half-columns with a fixed center node, then use weighted spacing (`4:1`) inside the active half so cards keep a consistent gap from the divider.
 - Added a real Settings sheet from Home (gear icon) with three controls: accent color, unlock-all-lessons toggle, and default answer method. Gotcha: default answer mode had to be threaded through `HomeView -> LessonView -> ActivityView` so it affects new activity attempts without breaking completed session restores.
+- Refactored a large `LessonMapView.swift` into a feature folder with small focused files. Bonus cleanup: moved lesson completion sheet UI out of `LessonView` so logic and presentation are easier to scan independently.
+- Accent-color polish pass: removed global app tint so system controls (alerts and navigation/back actions) keep native styling, and forced the “Ask for help” label to `.primary` for readability on high-contrast accent choices like teal.
+- Tint-scoping refinement: using a global `.tint(...)` was too blunt because it recolored alert actions and top nav back controls. Better pattern is targeted tint: apply accent only to the controls that should feel branded (settings button/sheet, in-lesson slide back, ask-for-help) and explicitly keep nav-alert actions at system default.
 
 ## Engineer's Wisdom
 - Small models + clear view composition beats giant view controllers.

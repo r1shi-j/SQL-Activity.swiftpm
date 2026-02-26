@@ -16,6 +16,7 @@ struct ActivityView: View {
     let activity: Activity
     var session: ActivitySession
     let defaultAnswerMode: AnswerMode
+    let accentColor: Color
     let isLast: Bool
     let onCompletion: () -> Void
     
@@ -33,10 +34,11 @@ struct ActivityView: View {
     @State private var helpError: String? = nil
     @State private var isHelpLoading = false
     
-    init(activity: Activity, session: ActivitySession, defaultAnswerMode: AnswerMode, isLast: Bool, onCompletion: @escaping () -> Void) {
+    init(activity: Activity, session: ActivitySession, defaultAnswerMode: AnswerMode, accentColor: Color, isLast: Bool, onCompletion: @escaping () -> Void) {
         self.activity = activity
         self.session = session
         self.defaultAnswerMode = defaultAnswerMode
+        self.accentColor = accentColor
         self.isLast = isLast
         self.onCompletion = onCompletion
         
@@ -77,8 +79,27 @@ struct ActivityView: View {
             
             HStack {
                 Spacer()
-                Button("Ask for help", systemImage: "sparkles", action: openHelp)
-                    .buttonStyle(.bordered)
+                if #available(iOS 26.0, *) {
+                    Button(action: openHelp) {
+                        Label("Ask for help", systemImage: "sparkles")
+                            .padding(4)
+                    }
+                    .font(.headline)
+                    .fontWidth(.expanded)
+                    .foregroundStyle(.primary.opacity(0.8))
+                    .buttonStyle(.glassProminent)
+                    .tint(accentColor.opacity(0.8))
+                } else {
+                    Button(action: openHelp) {
+                        Label("Ask for help", systemImage: "sparkles")
+                            .padding(4)
+                    }
+                    .font(.headline)
+                    .fontWidth(.expanded)
+                    .foregroundStyle(.primary.opacity(0.8))
+                    .buttonStyle(.borderedProminent)
+                    .tint(accentColor.opacity(0.8))
+                }
             }
             .padding(.horizontal)
             
@@ -146,6 +167,7 @@ struct ActivityView: View {
         }
         .sheet(isPresented: $isShowingHelp) {
             helpSheet
+                .tint(accentColor)
         }
         .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
         .onChange(of: answerMode) { oldValue, newValue in

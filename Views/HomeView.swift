@@ -30,7 +30,8 @@ struct HomeView: View {
                 if let idx = lessons.firstIndex(where: { $0.id == lesson.id }) {
                     LessonView(
                         lesson: $lessons[idx],
-                        defaultAnswerMode: defaultAnswerMode
+                        defaultAnswerMode: defaultAnswerMode,
+                        accentColor: accentColorOption.color
                     ) { success in
                         handleFinish(for: lessons[idx], success: success)
                     }
@@ -44,6 +45,7 @@ struct HomeView: View {
                     Button("Settings", systemImage: "gearshape") {
                         isShowingSettings = true
                     }
+                    .tint(accentColorOption.color)
                 }
             }
             .sheet(isPresented: $isShowingSettings) {
@@ -52,10 +54,10 @@ struct HomeView: View {
                     unlockAllLessons: $unlockAllLessons,
                     defaultAnswerModeRawValue: $defaultAnswerModeRawValue
                 )
+                .tint(accentColorOption.color)
                 .presentationDetents([.medium, .large])
             }
         }
-        .tint(accentColorOption.color)
     }
 
     private func handleFinish(for lesson: Lesson, success: Bool) {
