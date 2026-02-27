@@ -1,38 +1,20 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(AppSettings.self) private var settings
+    
     @State private var lessons: [Lesson] = Lesson.defaultLessons
     @State private var path = NavigationPath()
     @State private var isShowingSettings = false
     
-    @AppStorage("settings.accentColor") private var accentColorRawValue = AccentColorOption.indigo.rawValue
-    @AppStorage("settings.unlockAllLessons") private var unlockAllLessons = false
-    @AppStorage("settings.defaultAnswerMode") private var defaultAnswerModeRawValue = AnswerMode.blocks.rawValue
-    
-    private var accentColorOption: AccentColorOption {
-        AccentColorOption(rawValue: accentColorRawValue) ?? .indigo
-    }
-    
-    private var defaultAnswerMode: AnswerMode {
-        AnswerMode(rawValue: defaultAnswerModeRawValue) ?? .blocks
-    }
-    
     var body: some View {
         NavigationStack(path: $path) {
-            LessonMapView(
-                lessons: lessons,
-                unlockAllLessons: unlockAllLessons,
-                accentColor: accentColorOption.color
-            ) { lesson in
+            LessonMapView(lessons: lessons) { lesson in
                 path.append(lesson)
             }
             .navigationDestination(for: Lesson.self) { lesson in
                 if let idx = lessons.firstIndex(where: { $0.id == lesson.id }) {
-                    LessonView(
-                        lesson: $lessons[idx],
-                        defaultAnswerMode: defaultAnswerMode,
-                        accentColor: accentColorOption.color
-                    ) { success in
+                    LessonView(lesson: $lessons[idx]) { success in
                         handleFinish(for: lessons[idx], success: success)
                     }
                     .id(lesson.id)
@@ -45,17 +27,13 @@ struct HomeView: View {
                     Button("Settings", systemImage: "gearshape") {
                         isShowingSettings = true
                     }
-                    .tint(accentColorOption.color)
+                    .tint(settings.accentColorOption.color)
                 }
             }
             .sheet(isPresented: $isShowingSettings) {
-                SettingsView(
-                    accentColorRawValue: $accentColorRawValue,
-                    unlockAllLessons: $unlockAllLessons,
-                    defaultAnswerModeRawValue: $defaultAnswerModeRawValue
-                )
-                .tint(accentColorOption.color)
-                .presentationDetents([.medium, .large])
+                SettingsView(settings: settings)
+                    .tint(settings.accentColorOption.color)
+                    .presentationDetents([.fraction(0.75)])
             }
         }
     }

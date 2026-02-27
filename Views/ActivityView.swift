@@ -10,13 +10,13 @@ import FoundationModels
 import SwiftUI
 
 struct ActivityView: View {
+    @Environment(AppSettings.self) private var settings
+    
     @available(iOS 26.0, *)
     private var model: SystemLanguageModel { SystemLanguageModel.default }
     
     let activity: Activity
     var session: ActivitySession
-    let defaultAnswerMode: AnswerMode
-    let accentColor: Color
     let isLast: Bool
     let onCompletion: () -> Void
     
@@ -34,11 +34,9 @@ struct ActivityView: View {
     @State private var helpError: String? = nil
     @State private var isHelpLoading = false
     
-    init(activity: Activity, session: ActivitySession, defaultAnswerMode: AnswerMode, accentColor: Color, isLast: Bool, onCompletion: @escaping () -> Void) {
+    init(activity: Activity, session: ActivitySession, isLast: Bool, onCompletion: @escaping () -> Void) {
         self.activity = activity
         self.session = session
-        self.defaultAnswerMode = defaultAnswerMode
-        self.accentColor = accentColor
         self.isLast = isLast
         self.onCompletion = onCompletion
         
@@ -48,7 +46,7 @@ struct ActivityView: View {
         let available = activity.initialBlocks.enumerated().filter({ !Set(session.usedIndices).contains($0.offset) }).map({ $0.element })
         self._availableBlocks = State(initialValue: available)
         
-        let initialMode = AnswerMode(rawValue: session.completedMode ?? "") ?? defaultAnswerMode
+        let initialMode = AnswerMode(rawValue: session.completedMode ?? "") ?? .blocks
         self._answerMode = State(initialValue: initialMode)
         self._textAnswer = State(initialValue: session.completedAnswer ?? "")
     }
@@ -88,7 +86,7 @@ struct ActivityView: View {
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary.opacity(0.8))
                     .buttonStyle(.glassProminent)
-                    .tint(accentColor.opacity(0.8))
+                    .tint(settings.accentColorOption.color.opacity(0.8))
                 } else {
                     Button(action: openHelp) {
                         Label("Ask for help", systemImage: "sparkles")
@@ -98,7 +96,7 @@ struct ActivityView: View {
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary.opacity(0.8))
                     .buttonStyle(.borderedProminent)
-                    .tint(accentColor.opacity(0.8))
+                    .tint(settings.accentColorOption.color.opacity(0.8))
                 }
             }
             .padding(.horizontal)
@@ -167,9 +165,14 @@ struct ActivityView: View {
         }
         .sheet(isPresented: $isShowingHelp) {
             helpSheet
-                .tint(accentColor)
+                .tint(settings.accentColorOption.color)
         }
         .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
+        .onAppear {
+            if session.completedMode == nil {
+                answerMode = settings.defaultAnswerMode
+            }
+        }
         .onChange(of: answerMode) { oldValue, newValue in
             if newValue == .text {
                 textAnswer = usedBlocks.map(\.content).joined(separator: " ")

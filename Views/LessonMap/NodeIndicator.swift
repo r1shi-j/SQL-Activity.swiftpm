@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct NodeIndicator: View {
+    @Environment(AppSettings.self) private var settings
+    
     let status: LessonMapView.Status
-    let accentColor: Color
     
     var body: some View {
         if status == .completed {
@@ -27,7 +28,7 @@ struct NodeIndicator: View {
             case .completed:
                 return .green
             case .current:
-                return accentColor
+                return settings.accentColorOption.color
             case .locked:
                 return .gray
         }

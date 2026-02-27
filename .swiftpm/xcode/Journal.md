@@ -36,6 +36,8 @@ Think of the app like a restaurant:
 - Refactored a large `LessonMapView.swift` into a feature folder with small focused files. Bonus cleanup: moved lesson completion sheet UI out of `LessonView` so logic and presentation are easier to scan independently.
 - Accent-color polish pass: removed global app tint so system controls (alerts and navigation/back actions) keep native styling, and forced the “Ask for help” label to `.primary` for readability on high-contrast accent choices like teal.
 - Tint-scoping refinement: using a global `.tint(...)` was too blunt because it recolored alert actions and top nav back controls. Better pattern is targeted tint: apply accent only to the controls that should feel branded (settings button/sheet, in-lesson slide back, ask-for-help) and explicitly keep nav-alert actions at system default.
+- Architecture upgrade: replaced scattered `@AppStorage` usage with a single `AppSettings` environment model. Analogy: instead of each room in the house keeping its own weather app, the whole house now reads one thermostat. This reduced prop drilling, made settings reads consistent, and keeps persistence logic in one place.
+- Follow-up cleanup: once `AppSettings` existed, we removed settings arguments from `LessonMapView`, `LessonView`, and `ActivityView` and read settings directly from the environment in each view. Less plumbing, fewer initializer changes when adding a new setting, and clearer ownership boundaries.
 
 ## Engineer's Wisdom
 - Small models + clear view composition beats giant view controllers.

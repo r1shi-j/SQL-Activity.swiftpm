@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Binding var accentColorRawValue: String
-    @Binding var unlockAllLessons: Bool
-    @Binding var defaultAnswerModeRawValue: String
+    @Bindable var settings: AppSettings
     
     @Environment(\.dismiss) private var dismiss
     
@@ -11,7 +9,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section("Appearance") {
-                    Picker("Accent Colour", selection: $accentColorRawValue) {
+                    Picker("Accent Colour", selection: $settings.accentColorRawValue) {
                         ForEach(AccentColorOption.allCases) { option in
                             HStack {
                                 Circle()
@@ -25,11 +23,11 @@ struct SettingsView: View {
                 }
                 
                 Section("Progress") {
-                    Toggle("Unlock all lessons", isOn: $unlockAllLessons)
+                    Toggle("Unlock all lessons", isOn: $settings.unlockAllLessons)
                 }
                 
                 Section("Answers") {
-                    Picker("Default method", selection: $defaultAnswerModeRawValue) {
+                    Picker("Default method", selection: $settings.defaultAnswerModeRawValue) {
                         ForEach(AnswerMode.allCases) { mode in
                             Text(mode.title).tag(mode.rawValue)
                         }

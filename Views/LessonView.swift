@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct LessonView: View {
+    @Environment(AppSettings.self) private var settings
+    
     @Binding var lesson: Lesson
-    let defaultAnswerMode: AnswerMode
-    let accentColor: Color
     let goHome: (Bool) -> Void
     
     @State private var currentIndex = 0
@@ -24,10 +24,8 @@ struct LessonView: View {
     @State private var counter4 = 1
     @State private var counter5 = 1
     
-    init(lesson: Binding<Lesson>, defaultAnswerMode: AnswerMode, accentColor: Color, goHome: @escaping (Bool) -> Void) {
+    init(lesson: Binding<Lesson>, goHome: @escaping (Bool) -> Void) {
         _lesson = lesson
-        self.defaultAnswerMode = defaultAnswerMode
-        self.accentColor = accentColor
         self.goHome = goHome
         
         isShowingAlreadyCompletedAlert = _lesson.wrappedValue.isComplete
@@ -45,8 +43,6 @@ struct LessonView: View {
                             ActivityView(
                                 activity: activity,
                                 session: lesson.slides[currentIndex].activitySession,
-                                defaultAnswerMode: defaultAnswerMode,
-                                accentColor: accentColor,
                                 isLast: currentIndex + 1 == lesson.slides.count
                             ) {
                                 lesson.slides[currentIndex].isComplete = true
@@ -82,15 +78,15 @@ struct LessonView: View {
                                 .font(.title)
                                 .padding(8)
                                 .buttonStyle(.glassProminent)
-                                .tint(accentColor)
+                                .tint(settings.accentColorOption.color)
                         } else {
                             Button("Back", action: goBack)
                                 .font(.title)
                                 .padding(8)
-                                .background(.indigo)
+                                .background(settings.accentColorOption.color)
                                 .clipShape(.capsule)
                                 .padding()
-                                .tint(accentColor)
+                                .tint(settings.accentColorOption.color)
                         }
                     }
                 }
@@ -106,7 +102,7 @@ struct LessonView: View {
                 bottomLeftCounter: $counter3,
                 bottomRightCounter: $counter4
             )
-            .tint(accentColor)
+            .tint(settings.accentColorOption.color)
             .interactiveDismissDisabled()
         }
         .tint(.primary)

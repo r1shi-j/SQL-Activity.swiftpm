@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct LessonMapView: View {
+    @Environment(AppSettings.self) private var settings
+    
     let lessons: [Lesson]
-    let unlockAllLessons: Bool
-    let accentColor: Color
     let onSelectLesson: (Lesson) -> Void
     
     struct MapLesson: Identifiable {
@@ -33,7 +33,7 @@ struct LessonMapView: View {
             let status: Status
             if lesson.isComplete {
                 status = .completed
-            } else if unlockAllLessons || index == firstIncompleteIndex {
+            } else if settings.unlockAllLessons || index == firstIncompleteIndex {
                 status = .current
             } else {
                 status = .locked
@@ -64,7 +64,7 @@ struct LessonMapView: View {
                     
                     VStack(spacing: 36) {
                         ForEach(mapLessons) { lesson in
-                            LessonNodeView(lesson: lesson, accentColor: accentColor) {
+                            LessonNodeView(lesson: lesson) {
                                 onSelectLesson(lesson.lesson)
                             }
                         }

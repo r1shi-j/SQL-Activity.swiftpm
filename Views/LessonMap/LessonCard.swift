@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct LessonCard: View {
+    @Environment(AppSettings.self) private var settings
+    
     let lesson: LessonMapView.MapLesson
-    let accentColor: Color
     let action: () -> Void
     
     var body: some View {
@@ -33,7 +34,7 @@ struct LessonCard: View {
             case .completed:
                 return .green.opacity(0.12)
             case .current:
-                return accentColor.opacity(0.12)
+                return settings.accentColorOption.color.opacity(0.12)
             case .locked:
                 return .gray.opacity(0.08)
         }
@@ -44,7 +45,7 @@ struct LessonCard: View {
             case .completed:
                 return .green
             case .current:
-                return accentColor
+                return settings.accentColorOption.color
             case .locked:
                 return .gray
         }

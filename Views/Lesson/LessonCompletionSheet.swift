@@ -92,5 +92,6 @@ struct LessonCompletionSheet: View {
             .padding()
             .navigationTitle(lessonTitle)
         }
+        .background(AppTheme.successBackground.opacity(0.3).ignoresSafeArea())
     }
 }
