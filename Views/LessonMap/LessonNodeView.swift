@@ -13,12 +13,8 @@ struct LessonNodeView: View {
                     Spacer(minLength: 0)
                     Spacer(minLength: 0)
                     Spacer(minLength: 0)
-                    LessonCard(
-                        lesson: lesson,
-                        transitionNamespace: transitionNamespace,
-                        action: action
-                    )
-                    .frame(maxWidth: 220)
+                    animatedLessonCard
+                        .frame(maxWidth: 220)
                     Spacer(minLength: 0)
                         .overlay {
                             connectorLine
@@ -43,12 +39,8 @@ struct LessonNodeView: View {
                         .overlay {
                             connectorLine
                         }
-                    LessonCard(
-                        lesson: lesson,
-                        transitionNamespace: transitionNamespace,
-                        action: action
-                    )
-                    .frame(maxWidth: 220)
+                    animatedLessonCard
+                        .frame(maxWidth: 220)
                     Spacer(minLength: 0)
                     Spacer(minLength: 0)
                     Spacer(minLength: 0)
@@ -56,6 +48,22 @@ struct LessonNodeView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var animatedLessonCard: some View {
+        let emergeOffset = lesson.side == .left ? 46.0 : -46.0
+        LessonCard(
+            lesson: lesson,
+            transitionNamespace: transitionNamespace,
+            action: action
+        )
+        .scrollTransition(.animated(.bouncy(duration: 0.5)), axis: .vertical) { content, phase in
+            content
+                .opacity(phase.isIdentity ? 1 : 0.2)
+                .scaleEffect(phase.isIdentity ? 1 : 0.82)
+                .offset(x: phase.isIdentity ? 0 : emergeOffset)
         }
     }
     

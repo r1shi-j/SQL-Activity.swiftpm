@@ -93,29 +93,24 @@ private struct OnboardingPageView: View {
         }
     }
     
-    @ViewBuilder
     private var animatedHeroIcon: some View {
-        if #available(iOS 17.0, *) {
-            iconBase
-                .phaseAnimator([0, 1, 2]) { content, phase in
-                    content
-                        .scaleEffect(phase == 1 ? 1.08 : 1.0)
-                        .offset(y: phase == 2 ? -4 : 0)
-                } animation: { phase in
-                    switch phase {
-                        case 0:
-                                .smooth(duration: 0.9)
-                        case 1:
-                                .bouncy(duration: 0.7)
-                        case 2:
-                                .easeInOut(duration: 0.7)
-                        default:
-                                .default
-                    }
+        iconBase
+            .phaseAnimator([0, 1, 2]) { content, phase in
+                content
+                    .scaleEffect(phase == 1 ? 1.08 : 1.0)
+                    .offset(y: phase == 2 ? -4 : 0)
+            } animation: { phase in
+                switch phase {
+                    case 0:
+                            .smooth(duration: 0.9)
+                    case 1:
+                            .bouncy(duration: 0.7)
+                    case 2:
+                            .easeInOut(duration: 0.7)
+                    default:
+                            .default
                 }
-        } else {
-            iconBase
-        }
+            }
     }
     
     private var iconBase: some View {

@@ -439,32 +439,27 @@ struct ActivityView: View {
         isHelpLoading = false
     }
     
-    @ViewBuilder
     private func animatedSubmitButton(title: String, action: @escaping () -> Void, color: Color, useGlassStyle: Bool) -> some View {
-        if #available(iOS 17.0, *) {
-            submitActionButton(title: title, action: action, color: color, useGlassStyle: useGlassStyle)
-                .phaseAnimator([0, 1, 2], trigger: submitFeedbackTrigger) { content, phase in
-                    let isCorrect = session.wasCorrect == true
-                    content
-                        .scaleEffect(isCorrect ? (phase == 1 ? 1.08 : 1.0) : 1.0)
-                        .offset(x: isCorrect ? 0 : (phase == 1 ? -8 : (phase == 2 ? 8 : 0)))
-                } animation: { phase in
-                    switch phase {
-                        case 0:
+        submitActionButton(title: title, action: action, color: color, useGlassStyle: useGlassStyle)
+            .phaseAnimator([0, 1, 2], trigger: submitFeedbackTrigger) { content, phase in
+                let isCorrect = session.wasCorrect == true
+                content
+                    .scaleEffect(isCorrect ? (phase == 1 ? 1.08 : 1.0) : 1.0)
+                    .offset(x: isCorrect ? 0 : (phase == 1 ? -8 : (phase == 2 ? 8 : 0)))
+            } animation: { phase in
+                switch phase {
+                    case 0:
                             .smooth(duration: 0.08)
-                        case 1:
+                    case 1:
                             .spring(duration: 0.16, bounce: 0.55)
-                        case 2:
+                    case 2:
                             .spring(duration: 0.18, bounce: 0.32)
-                        default:
+                    default:
                             .default
-                    }
                 }
-        } else {
-            submitActionButton(title: title, action: action, color: color, useGlassStyle: useGlassStyle)
-        }
+            }
     }
-
+    
     @ViewBuilder
     private func submitActionButton(title: String, action: @escaping () -> Void, color: Color, useGlassStyle: Bool) -> some View {
         if useGlassStyle, #available(iOS 26.0, *) {
