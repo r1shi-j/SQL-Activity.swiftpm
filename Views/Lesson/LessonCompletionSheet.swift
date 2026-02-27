@@ -97,8 +97,6 @@ struct LessonCompletionSheet: View {
             .toolbar {
                 ToolbarItem(placement: .title) {
                     Text(lessonTitle)
-                        .font(.subheadline)
-                        .fontWeight(.bold)
                         .fontWidth(.expanded)
                 }
             }

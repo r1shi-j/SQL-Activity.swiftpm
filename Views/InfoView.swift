@@ -29,7 +29,6 @@ struct InfoView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(section.title)
                         .font(.headline)
-                        .fontWidth(.expanded)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(section.body)
                 }

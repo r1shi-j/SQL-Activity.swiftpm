@@ -8,6 +8,7 @@ struct MyApp: App {
         WindowGroup {
             HomeView()
                 .environment(settings)
+                .preferredColorScheme(.light)
         }
     }
 }
@@ -15,7 +16,6 @@ struct MyApp: App {
 /* TODO: below
  Better/more animations
  Use matched gemoetry effect for better transitions
- Use custom fonts
  Use new ios/swiftui features
  
  Drag blocks better

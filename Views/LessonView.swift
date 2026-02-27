@@ -61,8 +61,12 @@ struct LessonView: View {
                 ContentUnavailableView("No content", systemImage: "rectangle.on.rectangle.slash", description: Text("There appears to be no content here. Try again later."))
             }
         }
+        .onDisappear {
+            if !lesson.isComplete {
+                resetLesson()
+            }
+        }
         .background(currentBackground.ignoresSafeArea())
-        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .toolbar {
             ToolbarItem(placement: .title) {
@@ -110,7 +114,6 @@ struct LessonView: View {
             .presentationDetents([.medium])
             .interactiveDismissDisabled()
         }
-        .tint(.primary)
         .alert("Are you sure you want to exit this lesson?", isPresented: $isShowingExitConfirmation) {
             Button("No", role: .cancel) {}
                 .tint(.primary)
