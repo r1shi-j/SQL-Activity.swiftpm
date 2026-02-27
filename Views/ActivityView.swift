@@ -36,6 +36,12 @@ struct ActivityView: View {
     @State private var helpResponse = ""
     @State private var helpError: String? = nil
     @State private var isHelpLoading = false
+    @State private var lastSubmittedAnswer = ""
+    @State private var attemptFeedbackTitle = ""
+    @State private var attemptFeedbackExplanation = ""
+    @State private var attemptFeedbackNextStep = ""
+    @State private var attemptFeedbackError: String? = nil
+    @State private var isAttemptFeedbackLoading = false
     
     init(activity: Activity, session: ActivitySession, isLast: Bool, onCompletion: @escaping () -> Void) {
         self.activity = activity
@@ -55,137 +61,163 @@ struct ActivityView: View {
     }
     
     var body: some View {
-        VStack {
-            Text(activity.question)
-                .font(.title)
-                .padding()
-            
-            if let tip = activity.tip {
-                Text(tip)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack {
+                    Text(activity.question)
+                        .font(.title)
+                        .padding()
+                    
+                    if let tip = activity.tip {
+                        Text(tip)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    
+                    if let schema = activity.schema {
+                        GroupBox {
+                            Text(schema)
+                                .font(.system(.subheadline, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, 4)
+                        } label: {
+                            Text("Schema")
+                                .fontWidth(.expanded)
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    HStack {
+                        Spacer()
+                        if #available(iOS 26.0, *) {
+                            Button(action: openHelp) {
+                                Label("Ask for help", systemImage: "sparkles")
+                                    .padding(4)
+                            }
+                            .font(.headline)
+                            .fontWidth(.expanded)
+                            .foregroundStyle(.primary.opacity(0.8))
+                            .buttonStyle(.glassProminent)
+                            .tint(settings.accentColorOption.color.opacity(0.8))
+                        } else {
+                            Button(action: openHelp) {
+                                Label("Ask for help", systemImage: "sparkles")
+                                    .padding(4)
+                            }
+                            .font(.headline)
+                            .fontWidth(.expanded)
+                            .foregroundStyle(.primary.opacity(0.8))
+                            .buttonStyle(.borderedProminent)
+                            .tint(settings.accentColorOption.color.opacity(0.8))
+                        }
+                    }
                     .padding(.horizontal)
-            }
-            
-            if let schema = activity.schema {
-                GroupBox {
-                    Text(schema)
-                        .font(.system(.subheadline, design: .monospaced))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 4)
-                } label: {
-                    Text("Schema")
-                        .fontWidth(.expanded)
-                }
-                .padding(.horizontal)
-            }
-            
-            HStack {
-                Spacer()
-                if #available(iOS 26.0, *) {
-                    Button(action: openHelp) {
-                        Label("Ask for help", systemImage: "sparkles")
-                            .padding(4)
+                    
+                    Spacer()
+                    
+                    HStack {
+                        Text("Your Answer")
+                            .font(.headline)
+                            .fontWidth(.expanded)
+                        Spacer()
                     }
-                    .font(.headline)
-                    .fontWidth(.expanded)
-                    .foregroundStyle(.primary.opacity(0.8))
-                    .buttonStyle(.glassProminent)
-                    .tint(settings.accentColorOption.color.opacity(0.8))
-                } else {
-                    Button(action: openHelp) {
-                        Label("Ask for help", systemImage: "sparkles")
-                            .padding(4)
+                    .overlay {
+                        answerModePicker
                     }
-                    .font(.headline)
-                    .fontWidth(.expanded)
-                    .foregroundStyle(.primary.opacity(0.8))
-                    .buttonStyle(.borderedProminent)
-                    .tint(settings.accentColorOption.color.opacity(0.8))
+                    .padding()
+                    
+                    if answerMode == .blocks {
+                        blocksAnswerSection
+                    } else {
+                        textAnswerSection
+                    }
+                    
+                    if session.wasCorrect == false {
+                        attemptFeedbackSection
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                    }
+                    
+                    Spacer()
+                        .id("feedbackBottom")
                 }
+                .disabled(session.wasCorrect != nil || session.hasBeenCompleted)
             }
-            .padding(.horizontal)
-            
-            Spacer()
-            
-            HStack {
-                Text("Your Answer")
-                    .font(.headline)
-                    .fontWidth(.expanded)
-                Spacer()
-            }
-            .overlay {
-                answerModePicker
-            }
-            .padding()
-            
-            if answerMode == .blocks {
-                blocksAnswerSection
-            } else {
-                textAnswerSection
-            }
-            
-            Spacer()
-        }
-        .disabled(session.wasCorrect != nil || session.hasBeenCompleted)
-        .toolbar {
-            if !session.hasBeenCompleted {
-                ToolbarItem(placement: .destructiveAction) {
-                    Button("Retry", systemImage: "arrow.trianglehead.counterclockwise", action: clearUserAnswer)
-                        .tint(.red)
-                        .disabled(session.wasCorrect != nil)
-                }
-                if activity.hint != nil {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
-                            .tint(AppTheme.hintTint)
+            .toolbar {
+                if !session.hasBeenCompleted {
+                    ToolbarItem(placement: .destructiveAction) {
+                        Button("Retry", systemImage: "arrow.trianglehead.counterclockwise", action: clearUserAnswer)
+                            .tint(.red)
                             .disabled(session.wasCorrect != nil)
                     }
+                    if activity.hint != nil {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Show Hint", systemImage: "lightbulb.max.fill", action: showHint)
+                                .tint(AppTheme.hintTint)
+                                .disabled(session.wasCorrect != nil)
+                        }
+                    }
+                }
+                ToolbarItem(placement: .bottomBar) {
+                    let (title, action, color): (String, () -> Void, Color) = switch session.wasCorrect {
+                        case nil: ("Submit", verifyAnswer, .blue)
+                        case true: (isLast ? "Finish" : "Next", nextSlide, .green)
+                        case false: ("Retry", retryQuestion, .red)
+                        case .some(_): ("Oops", verifyAnswer, .primary)
+                    }
+                    if #available(iOS 26.0, *) {
+                        animatedSubmitButton(
+                            title: title,
+                            action: action,
+                            color: color,
+                            useGlassStyle: true
+                        )
+                    } else {
+                        animatedSubmitButton(
+                            title: title,
+                            action: action,
+                            color: color,
+                            useGlassStyle: false
+                        )
+                    }
                 }
             }
-            ToolbarItem(placement: .bottomBar) {
-                let (title, action, color): (String, () -> Void, Color) = switch session.wasCorrect {
-                    case nil: ("Submit", verifyAnswer, .blue)
-                    case true: (isLast ? "Finish" : "Next", nextSlide, .green)
-                    case false: ("Retry", retryQuestion, .red)
-                    case .some(_): ("Oops", verifyAnswer, .primary)
-                }
-                if #available(iOS 26.0, *) {
-                    animatedSubmitButton(
-                        title: title,
-                        action: action,
-                        color: color,
-                        useGlassStyle: true
-                    )
-                } else {
-                    animatedSubmitButton(
-                        title: title,
-                        action: action,
-                        color: color,
-                        useGlassStyle: false
-                    )
+            .sheet(isPresented: $isShowingHelp) {
+                helpSheet
+                    .tint(settings.accentColorOption.color)
+            }
+            .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
+            .onAppear {
+                if session.completedMode == nil {
+                    answerMode = settings.defaultAnswerMode
                 }
             }
-        }
-        .sheet(isPresented: $isShowingHelp) {
-            helpSheet
-                .tint(settings.accentColorOption.color)
-        }
-        .alert(activity.hint ?? "", isPresented: $isShowingHint) {}
-        .onAppear {
-            if session.completedMode == nil {
-                answerMode = settings.defaultAnswerMode
+            .onChange(of: answerMode) { oldValue, newValue in
+                if newValue == .text {
+                    textAnswer = usedBlocks.map(\.content).joined(separator: " ")
+                }
             }
-        }
-        .onChange(of: answerMode) { oldValue, newValue in
-            if newValue == .text {
-                textAnswer = usedBlocks.map(\.content).joined(separator: " ")
+            .onChange(of: session.wasCorrect) { _, newValue in
+                guard newValue != nil else { return }
+                submitFeedbackTrigger += 1
+                if newValue == false {
+                    DispatchQueue.main.async {
+                        withAnimation(.easeInOut(duration: 0.28)) {
+                            proxy.scrollTo("feedbackBottom", anchor: .bottom)
+                        }
+                    }
+                }
             }
-        }
-        .onChange(of: session.wasCorrect) { _, newValue in
-            guard newValue != nil else { return }
-            submitFeedbackTrigger += 1
+            .onChange(of: isAttemptFeedbackLoading) { _, isLoading in
+                guard isLoading == false, session.wasCorrect == false else { return }
+                DispatchQueue.main.async {
+                    withAnimation(.easeInOut(duration: 0.28)) {
+                        proxy.scrollTo("feedbackBottom", anchor: .bottom)
+                    }
+                }
+            }
         }
     }
     
@@ -197,6 +229,42 @@ struct ActivityView: View {
         }
         .pickerStyle(.segmented)
         .frame(width: 320)
+    }
+    
+    private var attemptFeedbackSection: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 10) {
+                if !lastSubmittedAnswer.isEmpty {
+                    Text("Your attempt: \(lastSubmittedAnswer)")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                
+                if isAttemptFeedbackLoading {
+                    ProgressView("Analyzing your SQL attempt…")
+                } else if let attemptFeedbackError {
+                    Text(attemptFeedbackError)
+                        .foregroundStyle(.secondary)
+                } else if !attemptFeedbackExplanation.isEmpty {
+                    Text(attemptFeedbackTitle.isEmpty ? "What to improve" : attemptFeedbackTitle)
+                        .font(.headline)
+                    Text(attemptFeedbackExplanation)
+                        .foregroundStyle(.secondary)
+                    if !attemptFeedbackNextStep.isEmpty {
+                        Text("Next step: \(attemptFeedbackNextStep)")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                } else {
+                    Text("No feedback yet.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } label: {
+            Label("AI Feedback", systemImage: "sparkles")
+                .font(.headline)
+                .fontWidth(.expanded)
+        }
     }
     
     private var helpSheet: some View {
@@ -399,6 +467,14 @@ struct ActivityView: View {
         isShowingHelp = true
     }
     
+    private func clearAttemptFeedback() {
+        isAttemptFeedbackLoading = false
+        attemptFeedbackTitle = ""
+        attemptFeedbackExplanation = ""
+        attemptFeedbackNextStep = ""
+        attemptFeedbackError = nil
+    }
+    
     private func defaultHelpPrompt() -> String {
         var prompt = "You are a SQL tutor. Give hints only; do not provide the full final query.\n"
         prompt += "Question: \(activity.question)\n"
@@ -437,6 +513,45 @@ struct ActivityView: View {
             helpError = error.localizedDescription
         }
         isHelpLoading = false
+    }
+    
+    @available(iOS 26.0, *)
+    @MainActor
+    private func requestAttemptFeedback(for attemptedAnswer: String) async {
+        guard model.availability == .available else {
+            attemptFeedbackError = "Apple Intelligence isn’t currently available for feedback."
+            return
+        }
+        guard !isAttemptFeedbackLoading else { return }
+        
+        isAttemptFeedbackLoading = true
+        attemptFeedbackError = nil
+        attemptFeedbackTitle = ""
+        attemptFeedbackExplanation = ""
+        attemptFeedbackNextStep = ""
+        
+        let prompt = """
+        Analyze this SQL learner attempt and provide concise coaching.
+        Question: \(activity.question)
+        Schema: \(activity.schema ?? "No schema provided")
+        Expected SQL: \(activity.answer)
+        User SQL: \(attemptedAnswer)
+        """
+        
+        let instructions = "You are a SQL tutor. Explain likely mistakes and one next step. Do not reveal the full final answer query."
+        let session = LanguageModelSession(model: model, instructions: instructions)
+        
+        do {
+            let response = try await session.respond(to: prompt, generating: SQLAttemptFeedback.self)
+            let feedback = response.content
+            attemptFeedbackTitle = feedback.mistakeCategory
+            attemptFeedbackExplanation = feedback.explanation
+            attemptFeedbackNextStep = feedback.nextStep
+        } catch {
+            attemptFeedbackError = error.localizedDescription
+        }
+        
+        isAttemptFeedbackLoading = false
     }
     
     private func animatedSubmitButton(title: String, action: @escaping () -> Void, color: Color, useGlassStyle: Bool) -> some View {
@@ -484,7 +599,7 @@ struct ActivityView: View {
                 .keyboardShortcut(.return, modifiers: [])
         }
     }
-
+    
     private func blockButton(_ block: Block, color: Color, action: @escaping () -> Void) -> some View {
         Button(block.content, action: action)
             .fontDesign(.monospaced)
@@ -493,28 +608,28 @@ struct ActivityView: View {
             .frame(height: 70)
             .onTapGesture(perform: action)
     }
-
+    
     private func canonicalSQLTokens(_ input: String) -> [String] {
         var tokens: [String] = []
         var index = input.startIndex
-
+        
         while index < input.endIndex {
             let character = input[index]
-
+            
             if character.isWhitespace {
                 index = input.index(after: index)
                 continue
             }
-
+            
             if character == "'" || character == "\"" {
                 let quote = character
                 var token = String(quote)
                 index = input.index(after: index)
-
+                
                 while index < input.endIndex {
                     let current = input[index]
                     token.append(current)
-
+                    
                     if current == quote {
                         let next = input.index(after: index)
                         if next < input.endIndex, input[next] == quote {
@@ -525,20 +640,20 @@ struct ActivityView: View {
                         index = next
                         break
                     }
-
+                    
                     index = input.index(after: index)
                 }
-
+                
                 tokens.append(token)
                 continue
             }
-
+            
             if ",();*+-/%.".contains(character) {
                 tokens.append(String(character))
                 index = input.index(after: index)
                 continue
             }
-
+            
             if "<>=!".contains(character) {
                 let next = input.index(after: index)
                 if next < input.endIndex {
@@ -549,12 +664,12 @@ struct ActivityView: View {
                         continue
                     }
                 }
-
+                
                 tokens.append(String(character))
                 index = next
                 continue
             }
-
+            
             let start = index
             while index < input.endIndex {
                 let current = input[index]
@@ -565,18 +680,18 @@ struct ActivityView: View {
             }
             tokens.append(String(input[start..<index]))
         }
-
+        
         var canonical = tokens.map { token -> String in
             if token.first == "'" || token.first == "\"" {
                 return token
             }
             return token.uppercased()
         }
-
+        
         while canonical.last == ";" {
             canonical.removeLast()
         }
-
+        
         return canonical
     }
     
@@ -787,6 +902,7 @@ struct ActivityView: View {
     private func clearUserAnswer() {
         guard availableBlocks != activity.initialBlocks || !usedBlocks.isEmpty || !textAnswer.isEmpty else { return }
         resetDragState()
+        clearAttemptFeedback()
         withAnimation {
             session.usedIndices.removeAll()
             session.completedAnswer = nil
@@ -804,16 +920,33 @@ struct ActivityView: View {
         } else {
             rawCandidate = formatTokens(usedBlocks.map(\.content))
         }
+        lastSubmittedAnswer = rawCandidate
+        
         let candidateTokens = canonicalSQLTokens(rawCandidate)
         let expectedTokens = canonicalSQLTokens(activity.answer)
-
+        let isCorrect = candidateTokens == expectedTokens
+        
+        if isCorrect {
+            clearAttemptFeedback()
+        }
+        
         withAnimation {
-            let isCorrect = candidateTokens == expectedTokens
             session.wasCorrect = isCorrect
             if isCorrect {
                 session.completedAnswer = rawCandidate
                 session.completedMode = answerMode.rawValue
             }
+        }
+        
+        guard !isCorrect else { return }
+        
+        clearAttemptFeedback()
+        if #available(iOS 26.0, *) {
+            Task { @MainActor in
+                await requestAttemptFeedback(for: rawCandidate)
+            }
+        } else {
+            attemptFeedbackError = "Detailed AI feedback requires iOS 26 or later."
         }
     }
     
@@ -892,3 +1025,14 @@ private struct BlockContainerFramePreferenceKey: PreferenceKey {
     }
 }
 
+@available(iOS 26.0, *)
+@Generable(description: "Structured coaching feedback for a SQL learner attempt.")
+private struct SQLAttemptFeedback {
+    @Guide(description: "A short mistake category title, 2 to 6 words.")
+    var mistakeCategory: String
+    @Guide(description: "One or two concise sentences describing what likely went wrong.")
+    var explanation: String
+    
+    @Guide(description: "A single concrete next edit step the learner should try next.")
+    var nextStep: String
+}
