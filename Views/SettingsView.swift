@@ -48,10 +48,17 @@ struct SettingsView: View {
                     }
                 }
             }
-            .navigationTitle("Settings")
             .toolbar {
+                ToolbarItem(placement: .title) {
+                    Text("Settings")
+                        .font(.largeTitle)
+                        .fontWidth(.expanded)
+                        .fontWeight(.bold)
+                        .padding(.top)
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
+                        .fontWidth(.expanded)
                 }
             }
         }

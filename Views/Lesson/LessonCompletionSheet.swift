@@ -77,6 +77,7 @@ struct LessonCompletionSheet: View {
                 
                 Text("Lesson Complete")
                     .font(.title2)
+                    .fontWidth(.expanded)
                 
                 Text("Nice work! You finished \(lessonTitle).")
                     .foregroundStyle(.secondary)
@@ -84,13 +85,23 @@ struct LessonCompletionSheet: View {
                 if #available(iOS 26.0, *) {
                     Button("Back to Lessons", action: onBackToLessons)
                         .buttonStyle(.glassProminent)
+                        .fontWidth(.expanded)
                 } else {
                     Button("Back to Lessons", action: onBackToLessons)
                         .buttonStyle(.borderedProminent)
+                        .fontWidth(.expanded)
                 }
             }
             .padding()
-            .navigationTitle(lessonTitle)
+            .padding(.bottom, 40)
+            .toolbar {
+                ToolbarItem(placement: .title) {
+                    Text(lessonTitle)
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .fontWidth(.expanded)
+                }
+            }
         }
         .background(AppTheme.successBackground.opacity(0.3).ignoresSafeArea())
     }

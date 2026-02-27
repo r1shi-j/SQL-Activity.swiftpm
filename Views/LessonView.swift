@@ -62,11 +62,13 @@ struct LessonView: View {
             }
         }
         .background(currentBackground.ignoresSafeArea())
-        .navigationTitle(lesson.title)
-//        .navigationSubtitle(lesson.subtitle ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .toolbar {
+            ToolbarItem(placement: .title) {
+                Text(lesson.title)
+                    .fontWidth(.expanded)
+            }
             ToolbarItem(placement: .navigation) {
                 Button("Back", systemImage: "chevron.left", action: toggleExitConfirmation)
             }
@@ -76,12 +78,14 @@ struct LessonView: View {
                         if #available(iOS 26.0, *) {
                             Button("Back", action: goBack)
                                 .font(.title)
+                                .fontWidth(.expanded)
                                 .padding(8)
                                 .buttonStyle(.glassProminent)
                                 .tint(settings.accentColorOption.color)
                         } else {
                             Button("Back", action: goBack)
                                 .font(.title)
+                                .fontWidth(.expanded)
                                 .padding(8)
                                 .background(settings.accentColorOption.color)
                                 .clipShape(.capsule)
@@ -103,6 +107,7 @@ struct LessonView: View {
                 bottomRightCounter: $counter4
             )
             .tint(settings.accentColorOption.color)
+            .presentationDetents([.medium])
             .interactiveDismissDisabled()
         }
         .tint(.primary)

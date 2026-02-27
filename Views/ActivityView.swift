@@ -66,11 +66,14 @@ struct ActivityView: View {
             }
             
             if let schema = activity.schema {
-                GroupBox("Schema") {
+                GroupBox {
                     Text(schema)
                         .font(.system(.subheadline, design: .monospaced))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 4)
+                } label: {
+                    Text("Schema")
+                        .fontWidth(.expanded)
                 }
                 .padding(.horizontal)
             }
@@ -106,6 +109,7 @@ struct ActivityView: View {
             HStack {
                 Text("Your Answer")
                     .font(.headline)
+                    .fontWidth(.expanded)
                 Spacer()
             }
             .overlay {
@@ -147,6 +151,8 @@ struct ActivityView: View {
                 if #available(iOS 26.0, *) {
                     Button(title, action: action)
                         .font(.title)
+                        .fontWidth(.expanded)
+                        .fontWeight(.regular)
                         .padding(8)
                         .buttonStyle(.glassProminent)
                         .tint(color)
@@ -154,6 +160,8 @@ struct ActivityView: View {
                 } else {
                     Button(title, action: action)
                         .font(.title)
+                        .fontWidth(.expanded)
+                        .fontWeight(.regular)
                         .padding(8)
                         .background(color)
                         .clipShape(.capsule)
@@ -202,12 +210,19 @@ struct ActivityView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Ask for help")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+                ToolbarItem(placement: .title) {
+                    Text("Ask for help")
+                        .padding(.top)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .fontWidth(.expanded)
+                }
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Close") {
                         isShowingHelp = false
                     }
+                    .fontWidth(.expanded)
                 }
             }
         }
@@ -221,6 +236,7 @@ struct ActivityView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Prompt")
                         .font(.headline)
+                        .fontWidth(.expanded)
                     TextEditor(text: $helpPrompt)
                         .font(.system(.body, design: .monospaced))
                         .frame(minHeight: 140)
@@ -228,9 +244,14 @@ struct ActivityView: View {
                         .background(.white.opacity(0.8))
                         .clipShape(.rect(cornerRadius: 12))
                     
-                    Button(isHelpLoading ? "Asking…" : "Ask") {
+                    Button {
                         Task { await requestHelp() }
+                    } label: {
+                        Label(isHelpLoading ? "Asking…" : "Ask", systemImage: "sparkles")
+                            .padding(4)
                     }
+                    .font(.headline)
+                    .fontWidth(.expanded)
                     .buttonStyle(.borderedProminent)
                     .disabled(isHelpLoading || helpPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .onAppear {
@@ -281,6 +302,7 @@ struct ActivityView: View {
                 
                 Text("Available Blocks")
                     .font(.headline)
+                    .fontWidth(.expanded)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                 
@@ -400,6 +422,7 @@ struct ActivityView: View {
     
     private func blockButton(_ block: Block, color: Color, action: @escaping () -> Void) -> some View {
         Button(block.content, action: action)
+            .fontDesign(.monospaced)
             .buttonStyle(GlassBlockButtonStyle(color: color))
             .contentShape(.capsule)
             .frame(height: 70)

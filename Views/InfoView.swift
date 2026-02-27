@@ -29,6 +29,7 @@ struct InfoView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(section.title)
                         .font(.headline)
+                        .fontWidth(.expanded)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(section.body)
                 }
@@ -47,12 +48,16 @@ struct InfoView: View {
                 if #available(iOS 26.0, *) {
                     Button(isLast ? "Finish" : "Next", action: onCompletion)
                         .font(.title)
+                        .fontWidth(.expanded)
+                        .fontWeight(.regular)
                         .padding(8)
                         .buttonStyle(.glassProminent)
                         .tint(.blue)
                 } else {
                     Button(isLast ? "Finish" : "Next", action: onCompletion)
                         .font(.title)
+                        .fontWidth(.expanded)
+                        .fontWeight(.regular)
                         .padding(8)
                         .background(.blue)
                         .clipShape(.capsule)

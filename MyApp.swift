@@ -12,14 +12,13 @@ struct MyApp: App {
     }
 }
 
-/*
- add better lessons, info more detailed, check for mistakes
- rename lessons
- 
+/* TODO: below
  Better/more animations
  Use matched gemoetry effect for better transitions
  Use custom fonts
- 
- Splash screen
  Use new ios/swiftui features
+ 
+ Drag blocks better
+ Redo lessons, info slides more detailed, check for mistakes, rename lessons
+ Redo splash screen data
 */
