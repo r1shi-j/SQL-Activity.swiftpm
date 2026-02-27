@@ -14,6 +14,8 @@ struct MyApp: App {
 }
 
 /* TODO: below
- Redo lessons, info slides more detailed, check for mistakes, rename lessons
+ info slides: fix data more centrally
+ 
+ Check data for mistakes
  Redo splash screen data
 */

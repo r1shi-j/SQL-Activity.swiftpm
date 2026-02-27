@@ -261,9 +261,18 @@ struct ActivityView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         } label: {
-            Label("AI Feedback", systemImage: "sparkles")
-                .font(.headline)
-                .fontWidth(.expanded)
+            HStack(spacing: 8) {
+                Label("AI Feedback", systemImage: "sparkles")
+                    .font(.headline)
+                    .fontWidth(.expanded)
+
+                Text("BETA")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.red, in: .capsule)
+            }
         }
     }
     
@@ -530,18 +539,42 @@ struct ActivityView: View {
         attemptFeedbackExplanation = ""
         attemptFeedbackNextStep = ""
         
-        let joinedSchemas = activity.schemas.joined(separator: "; ")
-        let joinedAnswers = activity.acceptedAnswers.joined(separator: "; ")
-        
+        let schemaContext: String
+        if activity.schemas.isEmpty {
+            schemaContext = "No schema provided"
+        } else {
+            schemaContext = activity.schemas.enumerated()
+                .map { index, schema in "\(index + 1). \(schema)" }
+                .joined(separator: "\n")
+        }
+
+        let expectedAnswersContext = activity.acceptedAnswers.enumerated()
+            .map { index, answer in "\(index + 1). \(answer)" }
+            .joined(separator: "\n")
+
         let prompt = """
         Analyze this SQL learner attempt and provide concise coaching.
-        Question: \(activity.question)
-        Schema: \(activity.schemas.isEmpty ? "No schema provided" : joinedSchemas)
-        Expected SQL: \(joinedAnswers)
-        User SQL: \(attemptedAnswer)
+
+        Activity Question:
+        \(activity.question)
+
+        Schema:
+        \(schemaContext)
+
+        Accepted Correct SQL Answers:
+        \(expectedAnswersContext)
+
+        Learner SQL Attempt:
+        \(attemptedAnswer)
+
+        IMPORTANT:
+        - Compare the learner attempt against the accepted answers.
+        - Explain what is wrong in terms of SQL structure, clauses, operators, or values.
+        - Give exactly one concrete next edit step.
+        - Do not output any full final correct query.
         """
-        
-        let instructions = "You are a SQL tutor. Explain likely mistakes and one next step. Do not reveal the full final answer query."
+
+        let instructions = "You are a SQL coach for beginners. Be precise, supportive, and concise. Focus on mistakes relative to accepted answers and propose one next fix only."
         let session = LanguageModelSession(model: model, instructions: instructions)
         
         do {
