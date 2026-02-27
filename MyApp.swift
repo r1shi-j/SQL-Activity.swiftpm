@@ -21,6 +21,5 @@ struct MyApp: App {
  Use custom fonts
  
  Splash screen
- Make app icon
  Use new ios/swiftui features
 */

@@ -8,20 +8,20 @@ import PackageDescription
 import AppleProductTypes
 
 let package = Package(
-    name: "SQL Activity",
+    name: "Learn SQL",
     platforms: [
         .iOS("18.1")
     ],
     products: [
         .iOSApplication(
-            name: "SQL Activity",
+            name: "Learn SQL",
             targets: ["AppModule"],
             bundleIdentifier: "com.jansari.rishi.SQL-Activity",
             teamIdentifier: "WGJA24P7XU",
             displayVersion: "1.0",
             bundleVersion: "1",
             appIcon: .asset("AppIcon"),
-            accentColor: .presetColor(.brown),
+            accentColor: .presetColor(.indigo),
             supportedDeviceFamilies: [
                 .pad,
                 .phone
