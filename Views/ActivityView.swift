@@ -115,7 +115,7 @@ struct ActivityView: View {
                     }
                     .padding(.horizontal)
                     
-                    Spacer()
+                    Divider()
                     
                     HStack {
                         Text("Your Answer")
@@ -126,7 +126,8 @@ struct ActivityView: View {
                     .overlay {
                         answerModePicker
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
                     
                     if answerMode == .blocks {
                         blocksAnswerSection
@@ -135,6 +136,7 @@ struct ActivityView: View {
                     }
                     
                     if session.wasCorrect == false {
+                        Divider()
                         attemptFeedbackSection
                             .padding(.horizontal)
                             .padding(.top, 8)
@@ -248,10 +250,10 @@ struct ActivityView: View {
                 } else if !attemptFeedbackExplanation.isEmpty {
                     Text(attemptFeedbackTitle.isEmpty ? "What to improve" : attemptFeedbackTitle)
                         .font(.headline)
-                    Text(attemptFeedbackExplanation)
+                    Text(attemptFeedbackExplanation.formattedBody())
                         .foregroundStyle(.secondary)
                     if !attemptFeedbackNextStep.isEmpty {
-                        Text("Next step: \(attemptFeedbackNextStep)")
+                        Text("Next step: \(attemptFeedbackNextStep.formattedBody())")
                             .font(.subheadline.weight(.semibold))
                     }
                 } else {
@@ -377,13 +379,14 @@ struct ActivityView: View {
                 .background(containerFrameReader(for: .used))
             
             if !session.hasBeenCompleted {
-                Divider().padding(.vertical)
+                Divider()
                 
                 Text("Available Blocks")
                     .font(.headline)
                     .fontWidth(.expanded)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
+                    .padding(.vertical, 6)
                 
                 Group {
                     if availableBlocks.isEmpty {
@@ -409,8 +412,6 @@ struct ActivityView: View {
                 .frame(maxWidth: .infinity, minHeight: 70)
                 .padding(.horizontal)
                 .background(containerFrameReader(for: .available))
-                
-                Divider().padding(.vertical)
             }
         }
         .coordinateSpace(name: "BlocksArea")

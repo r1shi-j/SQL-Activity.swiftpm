@@ -19,26 +19,30 @@ struct InfoView: View {
     }
     
     var body: some View {
-        VStack(spacing: 16) {
-            Text(info.title)
-                .font(.title)
-                .padding(.top)
-            
-            ForEach(Array(info.sections.enumerated()), id: \.element.id) { index, section in
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(section.title)
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(formattedBody(section.body))
+        GeometryReader { proxy in
+            VStack(spacing: 16) {
+                Text(info.title)
+                    .font(.title)
+                    .padding(.top)
+
+                ForEach(Array(info.sections.enumerated()), id: \.element.id) { index, section in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(section.title)
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(section.body.formattedBody())
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    if index != info.sections.indices.last {
+                        Divider()
+                    }
                 }
-                .padding(.horizontal)
-                
-                if index != info.sections.indices.last {
-                    Divider()
-                }
+
+                Spacer(minLength: 24)
             }
-            
-            Spacer(minLength: 24)
+            .frame(width: proxy.size.width * (2.0 / 3.0), alignment: .leading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
@@ -63,12 +67,5 @@ struct InfoView: View {
                 }
             }
         }
-    }
-    
-    private func formattedBody(_ text: String) -> AttributedString {
-        if let attributed = try? AttributedString(markdown: text) {
-            return attributed
-        }
-        return AttributedString(text)
     }
 }
