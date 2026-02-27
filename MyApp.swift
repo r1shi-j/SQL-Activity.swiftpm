@@ -14,8 +14,6 @@ struct MyApp: App {
 }
 
 /* TODO: below
- Better/more animations
- Use matched gemoetry effect for better transitions
  Use new ios/swiftui features
  
  Redo lessons, info slides more detailed, check for mistakes, rename lessons

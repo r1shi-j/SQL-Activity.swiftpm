@@ -2,9 +2,9 @@ import SwiftUI
 
 struct OnboardingView: View {
     let onFinish: () -> Void
-
+    
     @State private var currentPage = 0
-
+    
     private let pages: [OnboardingPage] = [
         OnboardingPage(
             title: "Welcome to SQL Activity",
@@ -22,7 +22,7 @@ struct OnboardingView: View {
             systemImage: "map.fill"
         )
     ]
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -35,7 +35,7 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
-
+                
                 VStack(spacing: 12) {
                     if currentPage < pages.count - 1 {
                         Button("Next") {
@@ -50,7 +50,7 @@ struct OnboardingView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
-
+                    
                     Button("Skip") {
                         onFinish()
                     }
@@ -73,27 +73,56 @@ private struct OnboardingPage: Equatable {
 
 private struct OnboardingPageView: View {
     let page: OnboardingPage
-
+    
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
-
-            Image(systemName: page.systemImage)
-                .font(.system(size: 64))
-                .foregroundStyle(.tint)
-                .frame(width: 120, height: 120)
-                .background(.tint.opacity(0.16), in: Circle())
-
+            
+            animatedHeroIcon
+            
             Text(page.title)
                 .font(.largeTitle.bold())
                 .multilineTextAlignment(.center)
-
+            
             Text(page.subtitle)
                 .font(.title3)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-
+            
             Spacer()
         }
+    }
+    
+    @ViewBuilder
+    private var animatedHeroIcon: some View {
+        if #available(iOS 17.0, *) {
+            iconBase
+                .phaseAnimator([0, 1, 2]) { content, phase in
+                    content
+                        .scaleEffect(phase == 1 ? 1.08 : 1.0)
+                        .offset(y: phase == 2 ? -4 : 0)
+                } animation: { phase in
+                    switch phase {
+                        case 0:
+                                .smooth(duration: 0.9)
+                        case 1:
+                                .bouncy(duration: 0.7)
+                        case 2:
+                                .easeInOut(duration: 0.7)
+                        default:
+                                .default
+                    }
+                }
+        } else {
+            iconBase
+        }
+    }
+    
+    private var iconBase: some View {
+        Image(systemName: page.systemImage)
+            .font(.system(size: 64))
+            .foregroundStyle(.tint)
+            .frame(width: 120, height: 120)
+            .background(.tint.opacity(0.16), in: Circle())
     }
 }

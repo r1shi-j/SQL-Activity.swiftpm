@@ -15,7 +15,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section("Appearance") {
-                    Picker("Accent Colour", selection: $settings.accentColorRawValue) {
+                    Picker("Accent Color", selection: $settings.accentColorRawValue) {
                         ForEach(AccentColorOption.allCases) { option in
                             HStack {
                                 Circle()

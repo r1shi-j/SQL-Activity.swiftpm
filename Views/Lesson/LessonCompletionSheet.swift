@@ -71,9 +71,7 @@ struct LessonCompletionSheet: View {
     private var completionContent: some View {
         NavigationStack {
             VStack(spacing: 16) {
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.green)
+                completionBadge
                 
                 Text("Lesson Complete")
                     .font(.title2)
@@ -103,4 +101,50 @@ struct LessonCompletionSheet: View {
         }
         .background(AppTheme.successBackground.opacity(0.3).ignoresSafeArea())
     }
+    
+    @ViewBuilder
+    private var completionBadge: some View {
+        if #available(iOS 17.0, *) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.green)
+                .keyframeAnimator(
+                    initialValue: CompletionBadgeAnimationValues(),
+                    trigger: centerCounter
+                ) { content, value in
+                    content
+                        .scaleEffect(value.scale)
+                        .offset(y: value.offsetY)
+                        .rotationEffect(value.rotation)
+                } keyframes: { _ in
+                    KeyframeTrack(\.scale) {
+                        CubicKeyframe(0.9, duration: 0.08)
+                        SpringKeyframe(1.16, duration: 0.24, spring: .bouncy)
+                        SpringKeyframe(1.0, duration: 0.22, spring: .snappy)
+                    }
+                    
+                    KeyframeTrack(\.offsetY) {
+                        CubicKeyframe(8, duration: 0.08)
+                        SpringKeyframe(-8, duration: 0.24, spring: .bouncy)
+                        SpringKeyframe(0, duration: 0.22, spring: .snappy)
+                    }
+                    
+                    KeyframeTrack(\.rotation) {
+                        CubicKeyframe(.degrees(-6), duration: 0.08)
+                        SpringKeyframe(.degrees(6), duration: 0.24, spring: .bouncy)
+                        SpringKeyframe(.degrees(0), duration: 0.22, spring: .snappy)
+                    }
+                }
+        } else {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.green)
+        }
+    }
 }
+private struct CompletionBadgeAnimationValues {
+    var scale: CGFloat = 1.0
+    var offsetY: CGFloat = 0
+    var rotation: Angle = .zero
+}
+

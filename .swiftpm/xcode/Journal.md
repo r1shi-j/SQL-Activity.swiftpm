@@ -54,3 +54,4 @@ Think of the app like a restaurant:
 I would plan for persistence earlier (SwiftData), so progress survives app restarts. I would also build a richer validation layer that understands SQL meaning rather than exact string matching.
 
 - Bugfix pass on block drag UX: prevented insertion-line artifacts on simple taps, made empty sections valid drop targets (so users can drag into an empty "Your Answer"), and reset transient drag state during retry/reset to avoid sticky visuals.
+- Animation polish pass: added a keyframe celebration animation to the lesson completion badge, phase-based feedback animation on the Submit/Retry/Next action button, and a subtle phased hero-icon animation in onboarding. This made important moments feel intentional without changing core app flow.
