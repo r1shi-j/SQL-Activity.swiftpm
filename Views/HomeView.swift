@@ -6,6 +6,7 @@ struct HomeView: View {
     @State private var lessons: [Lesson] = Lesson.defaultLessons
     @State private var path = NavigationPath()
     @State private var isShowingSettings = false
+    @State private var isShowingOnboarding = false
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -30,11 +31,24 @@ struct HomeView: View {
                     .tint(settings.accentColorOption.color)
                 }
             }
-            .sheet(isPresented: $isShowingSettings) {
-                SettingsView(settings: settings)
-                    .tint(settings.accentColorOption.color)
-                    .presentationDetents([.fraction(0.75)])
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            SettingsView(settings: settings) {
+                isShowingOnboarding = true
             }
+            .tint(settings.accentColorOption.color)
+            .presentationDetents([.fraction(0.9)])
+        }
+        .fullScreenCover(isPresented: $isShowingOnboarding) {
+            OnboardingView {
+                isShowingOnboarding = false
+            }
+            .tint(settings.accentColorOption.color)
+        }
+        .task {
+            guard settings.hasSeenOnboarding == false else { return }
+            settings.hasSeenOnboarding = true
+            isShowingOnboarding = true
         }
     }
     

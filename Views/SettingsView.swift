@@ -2,8 +2,14 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var settings: AppSettings
+    let onReplayOnboarding: () -> Void
     
     @Environment(\.dismiss) private var dismiss
+    
+    init(settings: AppSettings, onReplayOnboarding: @escaping () -> Void = {}) {
+        self._settings = Bindable(settings)
+        self.onReplayOnboarding = onReplayOnboarding
+    }
     
     var body: some View {
         NavigationStack {
@@ -33,6 +39,13 @@ struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                }
+                
+                Section("About") {
+                    Button("Replay intro") {
+                        dismiss()
+                        onReplayOnboarding()
+                    }
                 }
             }
             .navigationTitle("Settings")

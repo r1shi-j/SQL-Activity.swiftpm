@@ -39,6 +39,8 @@ Think of the app like a restaurant:
 - Architecture upgrade: replaced scattered `@AppStorage` usage with a single `AppSettings` environment model. Analogy: instead of each room in the house keeping its own weather app, the whole house now reads one thermostat. This reduced prop drilling, made settings reads consistent, and keeps persistence logic in one place.
 - Follow-up cleanup: once `AppSettings` existed, we removed settings arguments from `LessonMapView`, `LessonView`, and `ActivityView` and read settings directly from the environment in each view. Less plumbing, fewer initializer changes when adding a new setting, and clearer ownership boundaries.
 
+- Added a first-launch onboarding splash flow with a persisted `hasSeenOnboarding` flag in `AppSettings`, then wired a "Replay intro" button in Settings so demos and judges can revisit the walkthrough anytime. Gotcha: presenting onboarding from Home required a callback from `SettingsView` to avoid coupling settings UI to navigation state.
+
 ## Engineer's Wisdom
 - Small models + clear view composition beats giant view controllers.
 - Keep interactions reversible; dragging a block back out should be as easy as adding it.
