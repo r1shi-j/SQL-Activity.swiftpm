@@ -43,6 +43,8 @@ Think of the app like a restaurant:
 
 - Upgraded lesson navigation from default slide push to SwiftUI's built-in zoom navigation transition using `matchedTransitionSource` + `navigationTransition(.zoom)`. The transition now visually links each lesson card to its destination screen, which feels more intentional during demos.
 
+- Refactored block interaction in `ActivityView` to support long-press dragging from *any* block (used or available) with one shared insertion indicator and cross-section drop. We also removed the old burger-handle reorder UI. Gotcha: the insertion line and frame tracking had to move into a shared coordinate space (`BlocksArea`) so drag positions stay correct when crossing between sections.
+
 ## Engineer's Wisdom
 - Small models + clear view composition beats giant view controllers.
 - Keep interactions reversible; dragging a block back out should be as easy as adding it.
@@ -50,3 +52,5 @@ Think of the app like a restaurant:
 
 ## If I Were Starting Over...
 I would plan for persistence earlier (SwiftData), so progress survives app restarts. I would also build a richer validation layer that understands SQL meaning rather than exact string matching.
+
+- Bugfix pass on block drag UX: prevented insertion-line artifacts on simple taps, made empty sections valid drop targets (so users can drag into an empty "Your Answer"), and reset transient drag state during retry/reset to avoid sticky visuals.

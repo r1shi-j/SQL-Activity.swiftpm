@@ -18,7 +18,6 @@ struct MyApp: App {
  Use matched gemoetry effect for better transitions
  Use new ios/swiftui features
  
- Drag blocks better
  Redo lessons, info slides more detailed, check for mistakes, rename lessons
  Redo splash screen data
 */

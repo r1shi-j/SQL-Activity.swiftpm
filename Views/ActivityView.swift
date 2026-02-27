@@ -26,7 +26,9 @@ struct ActivityView: View {
     @State private var answerMode: AnswerMode
     @State private var textAnswer: String
     @State private var draggingBlockId: UUID? = nil
+    @State private var draggingSourceSection: BlockSection? = nil
     @State private var blockFrames: [UUID: CGRect] = [:]
+    @State private var containerFrames: [BlockSection: CGRect] = [:]
     @State private var insertionLine: InsertionLine? = nil
     @State private var isShowingHelp = false
     @State private var helpPrompt = ""
@@ -296,6 +298,7 @@ struct ActivityView: View {
         VStack {
             usedBlocksFlow
                 .padding(.horizontal)
+                .background(containerFrameReader(for: .used))
             
             if !session.hasBeenCompleted {
                 Divider().padding(.vertical)
@@ -306,31 +309,35 @@ struct ActivityView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                 
-                HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
-                    ForEach(availableBlocks, id: \.id) { block in
-                        blockButton(block, color: AppTheme.availableBlockTint) {
-                            addBlock(block)
+                Group {
+                    if availableBlocks.isEmpty {
+                        VStack(spacing: 10) {
+                            Text("You have used all the available blocks.")
+                                .font(.headline)
+                            Text("Click a block to remove it from your answer.")
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                    } else {
+                        HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
+                            ForEach(availableBlocks, id: \.id) { block in
+                                blockButton(block, color: AppTheme.availableBlockTint) {
+                                    addBlock(block)
+                                }
+                                .simultaneousGesture(reorderGesture(for: block))
+                                .background(blockFrameReader(for: block.id))
+                            }
                         }
                     }
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, minHeight: 70)
                 .padding(.horizontal)
+                .background(containerFrameReader(for: .available))
                 
                 Divider().padding(.vertical)
             }
         }
-    }
-    
-    private var usedBlocksFlow: some View {
-        HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
-            ForEach(usedBlocks, id: \.id) { block in
-                usedBlockView(block)
-                    .background(blockFrameReader(for: block.id))
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .contentShape(Rectangle())
-        .coordinateSpace(name: "UsedBlocks")
+        .coordinateSpace(name: "BlocksArea")
         .overlay {
             if let insertionLine {
                 Rectangle()
@@ -341,24 +348,37 @@ struct ActivityView: View {
             }
         }
         .onPreferenceChange(BlockFramePreferenceKey.self) { blockFrames = $0 }
+        .onPreferenceChange(BlockContainerFramePreferenceKey.self) { containerFrames = $0 }
+    }
+    
+    private var usedBlocksFlow: some View {
+        Group {
+            if usedBlocks.isEmpty {
+                VStack(spacing: 10) {
+                    Text("You haven't used any blocks yet.")
+                        .font(.headline)
+                    Text("Drag a block here from below, or alternatively click a block to add it to your answer.")
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+            } else {
+                HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 20, verticalSpacing: 15) {
+                    ForEach(usedBlocks, id: \.id) { block in
+                        usedBlockView(block)
+                            .background(blockFrameReader(for: block.id))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .contentShape(.rect)
+            }
+        }
     }
     
     private func usedBlockView(_ block: Block) -> some View {
-        HStack(spacing: 6) {
-            blockButton(block, color: AppTheme.usedBlockTint) {
-                removeBlock(block)
-            }
-            
-            if !session.hasBeenCompleted {
-                Image(systemName: "line.3.horizontal")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding(.trailing, 8)
-                    .contentShape(.rect)
-                    .gesture(reorderGesture(for: block))
-                    .accessibilityLabel("Reorder")
-            }
+        blockButton(block, color: AppTheme.usedBlockTint) {
+            removeBlock(block)
         }
+        .simultaneousGesture(reorderGesture(for: block))
         .opacity(draggingBlockId == block.id ? 0.6 : 1)
         .animation(.easeInOut(duration: 0.12), value: draggingBlockId)
     }
@@ -461,15 +481,16 @@ struct ActivityView: View {
     }
     
     private func reorderGesture(for block: Block) -> some Gesture {
-        LongPressGesture(minimumDuration: 0.2)
-            .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .named("UsedBlocks")))
+        LongPressGesture(minimumDuration: 0.1)
+            .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .named("BlocksArea")))
             .onChanged { value in
                 switch value {
                     case .first(true):
                         draggingBlockId = block.id
-                        updateInsertionLine(for: block.id, location: blockCenter(for: block.id))
+                        draggingSourceSection = section(of: block.id)
                     case .second(true, let drag?):
                         draggingBlockId = block.id
+                        draggingSourceSection = section(of: block.id)
                         updateInsertionLine(for: block.id, location: drag.location)
                     default:
                         break
@@ -478,11 +499,12 @@ struct ActivityView: View {
             .onEnded { value in
                 defer {
                     draggingBlockId = nil
+                    draggingSourceSection = nil
                     insertionLine = nil
                 }
                 switch value {
                     case .second(true, let drag?):
-                        finalizeReorder(draggedId: block.id, location: drag.location)
+                        finalizeDrag(draggedId: block.id, location: drag.location)
                     default:
                         break
                 }
@@ -492,8 +514,25 @@ struct ActivityView: View {
     private func blockFrameReader(for id: UUID) -> some View {
         GeometryReader { proxy in
             Color.clear
-                .preference(key: BlockFramePreferenceKey.self, value: [id: proxy.frame(in: .named("UsedBlocks"))])
+                .preference(key: BlockFramePreferenceKey.self, value: [id: proxy.frame(in: .named("BlocksArea"))])
         }
+    }
+    
+    private func containerFrameReader(for section: BlockSection) -> some View {
+        GeometryReader { proxy in
+            Color.clear
+                .preference(key: BlockContainerFramePreferenceKey.self, value: [section: proxy.frame(in: .named("BlocksArea"))])
+        }
+    }
+    
+    private func section(of id: UUID) -> BlockSection? {
+        if usedBlocks.contains(where: { $0.id == id }) {
+            return .used
+        }
+        if availableBlocks.contains(where: { $0.id == id }) {
+            return .available
+        }
+        return nil
     }
     
     private func blockCenter(for id: UUID) -> CGPoint {
@@ -506,31 +545,35 @@ struct ActivityView: View {
             insertionLine = nil
             return
         }
-        insertionLine = insertion
+        insertionLine = insertion.line
     }
     
-    private func finalizeReorder(draggedId: UUID, location: CGPoint) {
-        guard let info = insertionInfo(for: draggedId, location: location),
-              let fromIndex = usedBlocks.firstIndex(where: { $0.id == draggedId }) else { return }
+    private func finalizeDrag(draggedId: UUID, location: CGPoint) {
+        guard let fromSection = draggingSourceSection ?? section(of: draggedId),
+              let insertion = insertionInfo(for: draggedId, location: location) else { return }
         
-        var targetIndex = info.index
-        if targetIndex > fromIndex { targetIndex -= 1 }
-        guard targetIndex != fromIndex else { return }
+        moveBlock(draggedId: draggedId, from: fromSection, to: insertion.section, targetIndex: insertion.index)
+    }
+    
+    private func insertionInfo(for draggedId: UUID, location: CGPoint) -> InsertionPlacement? {
+        guard let targetSection = targetSection(for: location) else { return nil }
         
-        withAnimation {
-            let block = usedBlocks.remove(at: fromIndex)
-            usedBlocks.insert(block, at: targetIndex)
-            syncSessionUsedIndices()
+        let targetBlocks = blocks(in: targetSection)
+        let targetFrames = targetBlocks.compactMap { blockFrames[$0.id] }
+        
+        guard !targetFrames.isEmpty else {
+            guard let container = containerFrames[targetSection] else { return nil }
+            let line = InsertionLine(
+                x: container.minX + 16,
+                y: container.midY,
+                height: max(40, min(70, container.height * 0.5))
+            )
+            return InsertionPlacement(section: targetSection, index: 0, line: line)
         }
-    }
-    
-    private func insertionInfo(for draggedId: UUID, location: CGPoint) -> InsertionLine? {
-        let frames = usedBlocks.compactMap { blockFrames[$0.id] }
-        guard !frames.isEmpty else { return nil }
         
         var nearestIndex = 0
         var nearestDistance = CGFloat.greatestFiniteMagnitude
-        for (index, frame) in frames.enumerated() {
+        for (index, frame) in targetFrames.enumerated() {
             let center = CGPoint(x: frame.midX, y: frame.midY)
             let distance = hypot(center.x - location.x, center.y - location.y)
             if distance < nearestDistance {
@@ -539,20 +582,82 @@ struct ActivityView: View {
             }
         }
         
-        let targetFrame = frames[nearestIndex]
+        let targetFrame = targetFrames[nearestIndex]
         let insertBefore = location.x < targetFrame.midX
         let lineX = insertBefore ? targetFrame.minX : targetFrame.maxX
         let insertIndex = insertBefore ? nearestIndex : nearestIndex + 1
-        let line = InsertionLine(x: lineX, y: targetFrame.midY, height: targetFrame.height, index: insertIndex)
-        return line
+        let line = InsertionLine(x: lineX, y: targetFrame.midY, height: targetFrame.height)
+        return InsertionPlacement(section: targetSection, index: insertIndex, line: line)
+    }
+    
+    private func targetSection(for location: CGPoint) -> BlockSection? {
+        if let usedFrame = containerFrames[.used], usedFrame.contains(location) {
+            return .used
+        }
+        if let availableFrame = containerFrames[.available], availableFrame.contains(location) {
+            return .available
+        }
+        return nil
+    }
+    
+    private func blocks(in section: BlockSection) -> [Block] {
+        switch section {
+            case .used:
+                return usedBlocks
+            case .available:
+                return availableBlocks
+        }
+    }
+    
+    private func moveBlock(draggedId: UUID, from source: BlockSection, to destination: BlockSection, targetIndex: Int) {
+        switch source {
+            case .used:
+                guard let sourceIndex = usedBlocks.firstIndex(where: { $0.id == draggedId }) else { return }
+                withAnimation {
+                    let block = usedBlocks.remove(at: sourceIndex)
+                    if destination == .used {
+                        var index = targetIndex
+                        if index > sourceIndex { index -= 1 }
+                        index = max(0, min(index, usedBlocks.count))
+                        usedBlocks.insert(block, at: index)
+                    } else {
+                        let index = max(0, min(targetIndex, availableBlocks.count))
+                        availableBlocks.insert(block, at: index)
+                    }
+                    syncSessionUsedIndices()
+                }
+            case .available:
+                guard let sourceIndex = availableBlocks.firstIndex(where: { $0.id == draggedId }) else { return }
+                withAnimation {
+                    let block = availableBlocks.remove(at: sourceIndex)
+                    if destination == .available {
+                        var index = targetIndex
+                        if index > sourceIndex { index -= 1 }
+                        index = max(0, min(index, availableBlocks.count))
+                        availableBlocks.insert(block, at: index)
+                    } else {
+                        let index = max(0, min(targetIndex, usedBlocks.count))
+                        usedBlocks.insert(block, at: index)
+                    }
+                    syncSessionUsedIndices()
+                }
+        }
     }
     
     private func addBlock(_ block: Block) {
+        resetDragState()
         moveBlockToUsed(id: block.id)
     }
     
     private func removeBlock(_ block: Block) {
+        resetDragState()
         moveBlockToAvailable(id: block.id)
+    }
+    
+    private func resetDragState() {
+        draggingBlockId = nil
+        draggingSourceSection = nil
+        insertionLine = nil
     }
     
     private func showHint() {
@@ -561,6 +666,7 @@ struct ActivityView: View {
     
     private func clearUserAnswer() {
         guard availableBlocks != activity.initialBlocks || !usedBlocks.isEmpty || !textAnswer.isEmpty else { return }
+        resetDragState()
         withAnimation {
             session.usedIndices.removeAll()
             session.completedAnswer = nil
@@ -634,11 +740,21 @@ struct ActivityView: View {
     }
 }
 
+private enum BlockSection: Hashable {
+    case used
+    case available
+}
+
 private struct InsertionLine: Equatable {
     let x: CGFloat
     let y: CGFloat
     let height: CGFloat
+}
+
+private struct InsertionPlacement {
+    let section: BlockSection
     let index: Int
+    let line: InsertionLine
 }
 
 private struct BlockFramePreferenceKey: PreferenceKey {
@@ -648,3 +764,11 @@ private struct BlockFramePreferenceKey: PreferenceKey {
         value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
+private struct BlockContainerFramePreferenceKey: PreferenceKey {
+    static var defaultValue: [BlockSection: CGRect] { [:] }
+    
+    static func reduce(value: inout [BlockSection: CGRect], nextValue: () -> [BlockSection: CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
+    }
+}
+
