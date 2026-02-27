@@ -493,16 +493,91 @@ struct ActivityView: View {
             .frame(height: 70)
             .onTapGesture(perform: action)
     }
-    
-    private func normalizeSQL(_ input: String) -> String {
-        let padded = input
-            .replacingOccurrences(of: ",", with: " , ")
-            .replacingOccurrences(of: "(", with: "( ")
-            .replacingOccurrences(of: ")", with: " )")
-        return padded
-            .components(separatedBy: .whitespacesAndNewlines)
-            .filter { !$0.isEmpty }
-            .joined(separator: " ")
+
+    private func canonicalSQLTokens(_ input: String) -> [String] {
+        var tokens: [String] = []
+        var index = input.startIndex
+
+        while index < input.endIndex {
+            let character = input[index]
+
+            if character.isWhitespace {
+                index = input.index(after: index)
+                continue
+            }
+
+            if character == "'" || character == "\"" {
+                let quote = character
+                var token = String(quote)
+                index = input.index(after: index)
+
+                while index < input.endIndex {
+                    let current = input[index]
+                    token.append(current)
+
+                    if current == quote {
+                        let next = input.index(after: index)
+                        if next < input.endIndex, input[next] == quote {
+                            token.append(input[next])
+                            index = input.index(after: next)
+                            continue
+                        }
+                        index = next
+                        break
+                    }
+
+                    index = input.index(after: index)
+                }
+
+                tokens.append(token)
+                continue
+            }
+
+            if ",();*+-/%.".contains(character) {
+                tokens.append(String(character))
+                index = input.index(after: index)
+                continue
+            }
+
+            if "<>=!".contains(character) {
+                let next = input.index(after: index)
+                if next < input.endIndex {
+                    let pair = String(character) + String(input[next])
+                    if pair == "<=" || pair == ">=" || pair == "<>" || pair == "!=" {
+                        tokens.append(pair)
+                        index = input.index(after: next)
+                        continue
+                    }
+                }
+
+                tokens.append(String(character))
+                index = next
+                continue
+            }
+
+            let start = index
+            while index < input.endIndex {
+                let current = input[index]
+                if current.isWhitespace || ",();*+-/%.<>!=\"'".contains(current) {
+                    break
+                }
+                index = input.index(after: index)
+            }
+            tokens.append(String(input[start..<index]))
+        }
+
+        var canonical = tokens.map { token -> String in
+            if token.first == "'" || token.first == "\"" {
+                return token
+            }
+            return token.uppercased()
+        }
+
+        while canonical.last == ";" {
+            canonical.removeLast()
+        }
+
+        return canonical
     }
     
     private func formatTokens(_ tokens: [String]) -> String {
@@ -729,11 +804,11 @@ struct ActivityView: View {
         } else {
             rawCandidate = formatTokens(usedBlocks.map(\.content))
         }
-        let candidate = normalizeSQL(rawCandidate)
-        let expected = normalizeSQL(activity.answer)
-        
+        let candidateTokens = canonicalSQLTokens(rawCandidate)
+        let expectedTokens = canonicalSQLTokens(activity.answer)
+
         withAnimation {
-            let isCorrect = candidate == expected
+            let isCorrect = candidateTokens == expectedTokens
             session.wasCorrect = isCorrect
             if isCorrect {
                 session.completedAnswer = rawCandidate
