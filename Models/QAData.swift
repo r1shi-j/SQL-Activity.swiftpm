@@ -10,536 +10,458 @@ import Foundation
 extension Lesson {
     nonisolated(unsafe) static let defaultLessons = [
         Lesson(
-            title: "L0 Introduction", subtitle: "What is SQL?",
+            title: "Welcome to SQL",
+            subtitle: "How this app works",
             slides: [
                 Slide(kind: .info(Info(
-                    title: "What is a database?",
+                    title: "Learn by building",
                     sections: [
                         InfoSection(
-                            title: "Think of a spreadsheet",
-                            body: "A database stores information in tables. Tables have rows (records) and columns (fields)."
+                            title: "Block-first learning",
+                            body: "In this app, you build SQL queries from blocks. It helps you focus on query structure before memorizing syntax."
                         ),
                         InfoSection(
-                            title: "Tables you can ask questions about",
-                            body: "SQL is the language you use to ask questions like ‘Which pets are older than 3?’"
+                            title: "Two answer modes",
+                            body: "You can answer with blocks or in text mode. Blocks are ideal for learning. Text mode helps you practice writing real SQL."
                         )
                     ]
                 ))),
                 Slide(kind: .info(Info(
-                    title: "Meet our example data",
+                    title: "How to complete an activity",
                     sections: [
                         InfoSection(
-                            title: "Animals table",
-                            body: "Animals(id, name, species, age)\n\n1 | Luna | cat | 2\n2 | Max | dog | 5\n3 | Kiwi | bird | 1\n4 | Nova | cat | 4"
+                            title: "Tap or drag blocks",
+                            body: "Tap a block to move it between Available Blocks and Your Answer. Long-press and drag to reorder or move blocks across sections."
                         ),
                         InfoSection(
-                            title: "Owners table",
-                            body: "Owners(id, name, city)\n\n1 | Alex | London\n2 | Priya | Tokyo\n3 | Sam | Toronto"
+                            title: "Submit and improve",
+                            body: "Submit checks your query. If it is incorrect, use Hint or AI Feedback to understand what to fix next."
                         )
                     ]
                 ))),
                 Slide(kind: .info(Info(
-                    title: "What is SQL?",
+                    title: "SQL mindset",
                     sections: [
                         InfoSection(
-                            title: "A question language",
-                            body: "SQL (Structured Query Language) lets you read and change data stored in tables."
+                            title: "Ask clear questions",
+                            body: "SQL is how you ask a database questions. You choose columns, tables, filters, sorting, and grouping to get exactly the data you need."
                         ),
                         InfoSection(
-                            title: "Start with SELECT",
-                            body: "Most queries start with SELECT and tell the database what columns and table to read from."
-                        )
-                    ]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "The basic pattern",
-                    sections: [
-                        InfoSection(
-                            title: "SELECT → FROM → WHERE → ORDER BY",
-                            body: "SELECT chooses columns. FROM picks the table. WHERE filters rows. ORDER BY sorts the result."
-                        ),
-                        InfoSection(
-                            title: "Example",
-                            body: "SELECT name, age FROM Animals WHERE age > 3 ORDER BY age DESC"
-                        )
-                    ]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "How to read results",
-                    sections: [
-                        InfoSection(
-                            title: "A result is a new table",
-                            body: "Every SQL query returns a table. Sometimes it has fewer rows (filtered), sometimes fewer columns (selected)."
-                        ),
-                        InfoSection(
-                            title: "You’re ready",
-                            body: "Next, you’ll build your first SELECT queries using blocks."
+                            title: "Start simple",
+                            body: "You will begin with SELECT and FROM, then progressively add WHERE, ORDER BY, JOIN, GROUP BY, and more."
                         )
                     ]
                 )))
             ]
         ),
         Lesson(
-            title: "L1 Select Basics", subtitle: "SELECT / FROM",
+            title: "Tables and Query Flow",
+            subtitle: "Read before you write",
             slides: [
                 Slide(kind: .info(Info(
-                    title: "Start with SELECT",
+                    title: "Core example schema",
                     sections: [
                         InfoSection(
-                            title: "The core idea",
-                            body: "A SELECT query asks a database to show data. The FROM clause tells SQL which table to read from."
+                            title: "Animals",
+                            body: "Animals(id, name, species, age, owner_id)"
                         ),
                         InfoSection(
-                            title: "Pick columns",
-                            body: "Use * to select every column, or list specific column names separated by commas."
+                            title: "Owners",
+                            body: "Owners(id, name, city)"
+                        )
+                    ]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "SQL clause order",
+                    sections: [
+                        InfoSection(
+                            title: "Logical pattern",
+                            body: "A common query pattern is: SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ... LIMIT ..."
+                        ),
+                        InfoSection(
+                            title: "Build in layers",
+                            body: "Write a minimal query first, run it, then add one clause at a time. This makes debugging much easier."
+                        )
+                    ]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Ready for activities",
+                    sections: [
+                        InfoSection(
+                            title: "Goal of next lessons",
+                            body: "You will now practice each clause with hands-on activities. Expect distractor blocks to train careful thinking."
+                        ),
+                        InfoSection(
+                            title: "Tip",
+                            body: "If an answer looks almost right, check punctuation, clause order, and whether each needed token appears the correct number of times."
+                        )
+                    ]
+                )))
+            ]
+        ),
+        Lesson(
+            title: "Selecting Data",
+            subtitle: "SELECT and FROM",
+            slides: [
+                Slide(kind: .info(Info(
+                    title: "Return columns from a table",
+                    sections: [
+                        InfoSection(
+                            title: "SELECT chooses output",
+                            body: "Use SELECT to choose which columns appear in the result."
+                        ),
+                        InfoSection(
+                            title: "FROM chooses source",
+                            body: "FROM tells SQL which table to read."
                         )
                     ]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Select all columns from Animals.",
-                    tip: "Tip: Tap a block to add/remove. Long-press the grip to reorder.",
-                    hint: "Remember: SELECT * FROM table.",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT * FROM Animals",
-                    blocks: ["SELECT", "FROM", "*", "Animals", "Pets", "WHERE", "age", ">", "2"]
+                    question: "Select every column from Animals.",
+                    tip: "Build the shortest valid query.",
+                    hint: "Use SELECT * FROM Animals",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT * FROM Animals"
+                    ],
+                    blocks: ["SELECT", "*", "FROM", "Animals", "Owners", "WHERE", "age", ">", "2"]
                 ))),
                 Slide(kind: .activity(Activity(
                     question: "Select name and species from Animals.",
-                    tip: "Tip: Use a comma between columns.",
-                    hint: "List columns before FROM.",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT name, species FROM Animals",
-                    blocks: ["SELECT", "FROM", "name", "species", "age", "Animals", "Owners", ",", ","]
+                    hint: "Use a comma between name and species.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT name, species FROM Animals"
+                    ],
+                    blocks: ["SELECT", "name", ",", "species", "FROM", "Animals", "Owners", "age", "*"]
                 ))),
                 Slide(kind: .info(Info(
-                    title: "Nice work",
+                    title: "Great start",
                     sections: [
                         InfoSection(
-                            title: "What you learned",
-                            body: "SELECT + FROM is the backbone of SQL. Every other clause builds on these two."
+                            title: "What you unlocked",
+                            body: "You can now shape result columns and choose source tables."
                         ),
                         InfoSection(
-                            title: "Up next",
-                            body: "When you are ready, move on to filtering and sorting results."
+                            title: "Next",
+                            body: "Next lesson: filter rows with WHERE."
                         )
                     ]
                 )))
             ]
         ),
         Lesson(
-            title: "L2 Filtering and Sorting", subtitle: "WHERE / ORDER BY",
+            title: "Filtering Rows",
+            subtitle: "WHERE conditions",
             slides: [
                 Slide(kind: .info(Info(
-                    title: "Filter the rows",
+                    title: "Filter to relevant rows",
                     sections: [
                         InfoSection(
-                            title: "WHERE",
-                            body: "WHERE filters results so you only get the rows you care about."
+                            title: "WHERE applies conditions",
+                            body: "WHERE keeps only rows that match your condition."
                         ),
+                        InfoSection(
+                            title: "Combine with AND",
+                            body: "Use AND when multiple conditions must be true."
+                        )
+                    ]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "Select all animals older than 2.",
+                    hint: "Use WHERE age > 2.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT * FROM Animals WHERE age > 2"
+                    ],
+                    blocks: ["SELECT", "*", "FROM", "Animals", "WHERE", "age", ">", "2", "3", "<", "species"]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Text conditions",
+                    sections: [
+                        InfoSection(
+                            title: "String values",
+                            body: "Text values are written in quotes, such as 'cat'."
+                        ),
+                        InfoSection(
+                            title: "Multiple checks",
+                            body: "You can combine species and age checks in one WHERE clause."
+                        )
+                    ]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "Select animal names where species is 'cat' and age is at least 2.",
+                    hint: "Use AND between the two conditions.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT name FROM Animals WHERE species = 'cat' AND age >= 2"
+                    ],
+                    blocks: ["SELECT", "name", "FROM", "Animals", "WHERE", "species", "=", "'cat'", "AND", "age", ">=", "2", "3", "OR"]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Filter mastery",
+                    sections: [
+                        InfoSection(
+                            title: "You can target rows",
+                            body: "WHERE is one of the most-used SQL tools in real projects."
+                        ),
+                        InfoSection(
+                            title: "Next",
+                            body: "Now you will sort and trim result sets."
+                        )
+                    ]
+                )))
+            ]
+        ),
+        Lesson(
+            title: "Sorting and Limiting",
+            subtitle: "ORDER BY and LIMIT",
+            slides: [
+                Slide(kind: .info(Info(
+                    title: "Control result order",
+                    sections: [
                         InfoSection(
                             title: "ORDER BY",
-                            body: "ORDER BY sorts results. DESC means descending, ASC means ascending."
+                            body: "ORDER BY sorts rows. Use DESC for highest-to-lowest, ASC for lowest-to-highest."
+                        ),
+                        InfoSection(
+                            title: "LIMIT",
+                            body: "LIMIT returns only the first N rows after sorting."
                         )
                     ]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Find all dogs older than 3.",
-                    tip: "Tip: Tap a block to add/remove. Long-press the grip to reorder.",
-                    hint: "Use WHERE age > 3.",
-                    schema: "Dogs(id, name, age, breed)",
-                    answer: "SELECT * FROM Dogs WHERE age > 3",
-                    blocks: ["SELECT", "FROM", "WHERE", "*", "Dogs", "Cats", "age", "3", "2", ">", "<", "="]
+                    question: "Return names of the 3 oldest animals.",
+                    hint: "Sort by age descending, then limit to 3.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT name FROM Animals ORDER BY age DESC LIMIT 3"
+                    ],
+                    blocks: ["SELECT", "name", "FROM", "Animals", "ORDER BY", "age", "DESC", "ASC", "LIMIT", "3", "5", "WHERE"]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Select name and age for dogs older than 3 and order by age desc.",
-                    tip: "Tip: ORDER BY comes after WHERE.",
-                    hint: "DESC is descending.",
-                    schema: "Dogs(id, name, age, breed)",
-                    answer: "SELECT name, age FROM Dogs WHERE age > 3 ORDER BY age DESC",
-                    blocks: ["SELECT", "FROM", "WHERE", "ORDER BY", "name", "age", "age", "Dogs", "Animals", ">", "3", "DESC", "ASC", ","]
+                    question: "List owner names alphabetically and show only the first 5.",
+                    hint: "Alphabetical order means ORDER BY name ASC.",
+                    schemas: [
+                        "Owners(id, name, city)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT name FROM Owners ORDER BY name ASC LIMIT 5",
+                        "SELECT name FROM Owners ORDER BY name LIMIT 5"
+                    ],
+                    blocks: ["SELECT", "name", "FROM", "Owners", "ORDER BY", "LIMIT", "ASC", "DESC", "5", "city", "WHERE"]
                 ))),
                 Slide(kind: .info(Info(
-                    title: "Sort it out",
+                    title: "Readable result sets",
                     sections: [
                         InfoSection(
-                            title: "Chain clauses",
-                            body: "You can chain WHERE and ORDER BY to filter and then sort results."
+                            title: "Order then limit",
+                            body: "Sort first so the top N rows are meaningful."
                         ),
                         InfoSection(
-                            title: "Next step",
-                            body: "Next up: combining data from multiple tables with JOINs."
-                        )
-                    ]
-                )))
-            ]
-        ),
-        Lesson(
-            title: "L3 Joins", subtitle: "Combine tables",
-            slides: [
-                Slide(kind: .info(Info(
-                    title: "Two tables, one story",
-                    sections: [
-                        InfoSection(
-                            title: "JOINs",
-                            body: "JOINs combine rows from two tables using a shared key."
-                        ),
-                        InfoSection(
-                            title: "INNER JOIN",
-                            body: "INNER JOIN returns only rows that match in both tables."
-                        )
-                    ]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List owner names with their pet names.",
-                    tip: "Tip: The ON clause connects the keys.",
-                    hint: "Owners.id matches Pets.owner_id.",
-                    schema: "Owners(id, name, city)\nPets(id, name, owner_id)",
-                    answer: "SELECT Owners.name, Pets.name FROM Owners INNER JOIN Pets ON Owners.id = Pets.owner_id",
-                    blocks: ["SELECT", "FROM", "INNER JOIN", "LEFT JOIN", "ON", "Owners", "Pets", "Owners.name", "Pets.name", "Owners.id", "Pets.owner_id", ",", ","]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "Show pet name and owner city using a join.",
-                    tip: "Tip: Choose columns from each table.",
-                    hint: "Pets.owner_id links to Owners.id.",
-                    schema: "Owners(id, name, city)\nPets(id, name, owner_id)",
-                    answer: "SELECT Pets.name, Owners.city FROM Pets INNER JOIN Owners ON Pets.owner_id = Owners.id",
-                    blocks: ["SELECT", "FROM", "INNER JOIN", "ON", "Owners", "Pets", "Pets.name", "Owners.city", "Owners.name", "Pets.owner_id", "Owners.id", ",", ","]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "Joined up",
-                    sections: [
-                        InfoSection(
-                            title: "Why joins matter",
-                            body: "JOINs are how you tell bigger stories with your data."
-                        ),
-                        InfoSection(
-                            title: "Next step",
-                            body: "Next up: aggregation with COUNT and GROUP BY."
+                            title: "Next",
+                            body: "You will now summarize data with GROUP BY."
                         )
                     ]
                 )))
             ]
         ),
         Lesson(
-            title: "L4 Aggregation", subtitle: "COUNT / GROUP BY / HAVING",
+            title: "Grouping and Aggregation",
+            subtitle: "COUNT, AVG, GROUP BY, HAVING",
             slides: [
                 Slide(kind: .info(Info(
-                    title: "Count and group",
+                    title: "Summarize many rows",
                     sections: [
                         InfoSection(
-                            title: "Aggregation",
-                            body: "Aggregation lets you summarize data with functions like COUNT, SUM, and AVG."
+                            title: "Aggregate functions",
+                            body: "COUNT, SUM, AVG, MIN, and MAX summarize values across rows."
                         ),
                         InfoSection(
-                            title: "GROUP BY + HAVING",
-                            body: "GROUP BY collects rows into groups. HAVING filters groups after they are made."
+                            title: "GROUP BY",
+                            body: "GROUP BY creates one output row per group."
                         )
                     ]
                 ))),
                 Slide(kind: .activity(Activity(
                     question: "Count animals per species.",
-                    tip: "Tip: COUNT goes in the SELECT list.",
-                    hint: "Use GROUP BY species.",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT species, COUNT ( * ) FROM Animals GROUP BY species",
-                    blocks: ["SELECT", "FROM", "GROUP BY", "COUNT", "(", ")", "*", "species", "species", "Animals", "HAVING", ">", "2", ",", ","]
+                    hint: "Select species and COUNT(*), then group by species.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT species, COUNT(*) FROM Animals GROUP BY species",
+                        "SELECT species, COUNT ( * ) FROM Animals GROUP BY species"
+                    ],
+                    blocks: ["SELECT", "species", ",", "COUNT", "(", "*", ")", "FROM", "Animals", "GROUP BY", "species", "HAVING", ">", "2"]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Show species with more than 2 animals.",
-                    tip: "Tip: HAVING filters groups after GROUP BY.",
-                    hint: "Use HAVING COUNT ( * ) > 2.",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT species, COUNT ( * ) FROM Animals GROUP BY species HAVING COUNT ( * ) > 2",
-                    blocks: ["SELECT", "FROM", "GROUP BY", "HAVING", "COUNT", "COUNT", "(", "(", ")", ")", "*", "*", "species", "species", "Animals", ">", "2", ",", ","]
+                    question: "Show species where average age is greater than 3.",
+                    hint: "Use HAVING after GROUP BY.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT species, AVG(age) FROM Animals GROUP BY species HAVING AVG(age) > 3",
+                        "SELECT species, AVG ( age ) FROM Animals GROUP BY species HAVING AVG ( age ) > 3"
+                    ],
+                    blocks: ["SELECT", "species", ",", "AVG", "(", "age", ")", "FROM", "Animals", "GROUP BY", "species", "HAVING", "AVG", "(", "age", ")", ">", "3", "2"]
                 ))),
                 Slide(kind: .info(Info(
-                    title: "You are aggregating now",
+                    title: "You can summarize datasets",
                     sections: [
                         InfoSection(
-                            title: "What you learned",
-                            body: "COUNT and GROUP BY turn raw rows into useful summaries."
+                            title: "Why this matters",
+                            body: "Aggregation helps you move from raw records to business insights."
                         ),
                         InfoSection(
-                            title: "What’s next",
-                            body: "From here you can learn INSERT, UPDATE, and DELETE to change data."
+                            title: "Next",
+                            body: "Next you will combine tables with JOIN."
                         )
                     ]
                 )))
             ]
         ),
         Lesson(
-            title: "L5 Insert / Update / Delete", subtitle: "Modify data",
+            title: "Joining Tables",
+            subtitle: "INNER JOIN and ON",
             slides: [
                 Slide(kind: .info(Info(
-                    title: "Changing data",
+                    title: "Relational thinking",
+                    sections: [
+                        InfoSection(
+                            title: "JOIN connects tables",
+                            body: "Use JOIN when data you need lives in multiple tables."
+                        ),
+                        InfoSection(
+                            title: "ON defines match",
+                            body: "ON tells SQL how rows relate between tables, usually by IDs."
+                        )
+                    ]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "List each animal name with its owner name.",
+                    hint: "Match Animals.owner_id to Owners.id.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)",
+                        "Owners(id, name, city)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT Animals.name, Owners.name FROM Animals INNER JOIN Owners ON Animals.owner_id = Owners.id"
+                    ],
+                    blocks: ["SELECT", "Animals.name", ",", "Owners.name", "FROM", "Animals", "INNER JOIN", "LEFT JOIN", "Owners", "ON", "Animals.owner_id", "=", "Owners.id", "Owners.city"]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Adding a filter after join",
+                    sections: [
+                        InfoSection(
+                            title: "Order of clauses",
+                            body: "JOIN happens in the FROM section, then WHERE can filter joined results."
+                        ),
+                        InfoSection(
+                            title: "Common pattern",
+                            body: "SELECT columns FROM A INNER JOIN B ON ... WHERE ..."
+                        )
+                    ]
+                ))),
+                Slide(kind: .activity(Activity(
+                    question: "List animal and owner names for owners in London.",
+                    hint: "Use WHERE Owners.city = 'London'.",
+                    schemas: [
+                        "Animals(id, name, species, age, owner_id)",
+                        "Owners(id, name, city)"
+                    ],
+                    acceptedAnswers: [
+                        "SELECT Animals.name, Owners.name FROM Animals INNER JOIN Owners ON Animals.owner_id = Owners.id WHERE Owners.city = 'London'"
+                    ],
+                    blocks: ["SELECT", "Animals.name", ",", "Owners.name", "FROM", "Animals", "INNER JOIN", "Owners", "ON", "Animals.owner_id", "=", "Owners.id", "WHERE", "Owners.city", "'London'", "'Tokyo'", "AND"]
+                ))),
+                Slide(kind: .info(Info(
+                    title: "Joined successfully",
+                    sections: [
+                        InfoSection(
+                            title: "Cross-table queries",
+                            body: "You can now answer questions that require relationships between entities."
+                        ),
+                        InfoSection(
+                            title: "Next",
+                            body: "Final lesson: modifying data safely."
+                        )
+                    ]
+                )))
+            ]
+        ),
+        Lesson(
+            title: "Changing Data",
+            subtitle: "INSERT, UPDATE, DELETE",
+            slides: [
+                Slide(kind: .info(Info(
+                    title: "Write operations",
                     sections: [
                         InfoSection(
                             title: "INSERT",
-                            body: "INSERT adds new rows into a table."
+                            body: "INSERT creates new rows."
                         ),
                         InfoSection(
-                            title: "UPDATE + DELETE",
-                            body: "UPDATE edits existing rows. DELETE removes rows that match a condition."
+                            title: "UPDATE and DELETE",
+                            body: "UPDATE changes rows. DELETE removes rows. Both usually need WHERE to avoid affecting everything."
                         )
                     ]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Insert a new animal named Milo, a cat, age 2.",
-                    tip: "Tip: Columns go in the first parentheses, values in the second.",
-                    hint: "Use INSERT INTO ... VALUES (...)",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "INSERT INTO Animals ( name, species, age ) VALUES ( 'Milo', 'cat', 2 )",
-                    blocks: [
-                        "INSERT", "INTO", "VALUES", "Animals", "(", ")", "(", ")",
-                        "name", "species", "age", ",", ",", ",", "'Milo'", "'cat'", "2"
-                    ]
+                    question: "Insert a new owner named Riley in Berlin.",
+                    hint: "Provide columns and then VALUES in the same order.",
+                    schemas: [
+                        "Owners(id, name, city)"
+                    ],
+                    acceptedAnswers: [
+                        "INSERT INTO Owners (name, city) VALUES ('Riley', 'Berlin')",
+                        "INSERT INTO Owners ( name, city ) VALUES ( 'Riley', 'Berlin' )"
+                    ],
+                    blocks: ["INSERT", "INTO", "Owners", "(", "name", ",", "city", ")", "VALUES", "(", "'Riley'", ",", "'Berlin'", ")", "UPDATE", "WHERE"]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Update Milo’s age to 4.",
-                    tip: "Tip: SET chooses which column to change.",
-                    hint: "Use WHERE name = 'Milo'.",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "UPDATE Animals SET age = 4 WHERE name = 'Milo'",
-                    blocks: ["UPDATE", "SET", "WHERE", "Animals", "age", "name", "=", "=", "4", "'Milo'"]
+                    question: "Update the city of owner Riley to Paris.",
+                    hint: "Use WHERE name = 'Riley'.",
+                    schemas: [
+                        "Owners(id, name, city)"
+                    ],
+                    acceptedAnswers: [
+                        "UPDATE Owners SET city = 'Paris' WHERE name = 'Riley'"
+                    ],
+                    blocks: ["UPDATE", "Owners", "SET", "city", "=", "'Paris'", "WHERE", "name", "=", "'Riley'", "'Berlin'", "DELETE"]
                 ))),
                 Slide(kind: .activity(Activity(
-                    question: "Delete animals younger than 2.",
-                    tip: "Tip: DELETE works with WHERE just like SELECT.",
-                    hint: "Use DELETE FROM ... WHERE age < 2",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "DELETE FROM Animals WHERE age < 2",
-                    blocks: ["DELETE", "FROM", "WHERE", "Animals", "age", "<", "2"]
+                    question: "Delete visits where cost is less than 20.",
+                    hint: "DELETE FROM Visits WHERE cost < 20",
+                    schemas: [
+                        "Visits(id, animal_id, visit_date, cost)"
+                    ],
+                    acceptedAnswers: [
+                        "DELETE FROM Visits WHERE cost < 20"
+                    ],
+                    blocks: ["DELETE", "FROM", "Visits", "WHERE", "cost", "<", "20", "30", "UPDATE", "SET"]
                 ))),
                 Slide(kind: .info(Info(
-                    title: "Data changed",
+                    title: "You finished the core path",
                     sections: [
                         InfoSection(
-                            title: "Be careful",
-                            body: "UPDATE and DELETE are powerful. Always check your WHERE clause."
+                            title: "SQL foundations complete",
+                            body: "You covered reading, filtering, sorting, grouping, joining, and writing data."
                         ),
                         InfoSection(
-                            title: "Next step",
-                            body: "Let’s explore distinct values and pattern matching next."
-                        )
-                    ]
-                )))
-            ]
-        ),
-        Lesson(
-            title: "L6 Distinct / Like / Limit", subtitle: "Refine results",
-            slides: [
-                Slide(kind: .info(Info(
-                    title: "Refine results",
-                    sections: [
-                        InfoSection(
-                            title: "DISTINCT",
-                            body: "DISTINCT removes duplicate rows from a result set."
-                        ),
-                        InfoSection(
-                            title: "LIKE + LIMIT",
-                            body: "LIKE matches patterns in text. LIMIT restricts how many rows you get."
-                        )
-                    ]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List distinct species from Animals.",
-                    tip: "Tip: DISTINCT goes right after SELECT.",
-                    hint: "SELECT DISTINCT species FROM Animals",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT DISTINCT species FROM Animals",
-                    blocks: ["SELECT", "DISTINCT", "FROM", "species", "Animals", "name"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List the oldest 5 animals by age.",
-                    tip: "Tip: ORDER BY before LIMIT.",
-                    hint: "Use ORDER BY age DESC LIMIT 5",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT name FROM Animals ORDER BY age DESC LIMIT 5",
-                    blocks: ["SELECT", "FROM", "ORDER BY", "LIMIT", "name", "Animals", "age", "DESC", "ASC", "5"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "Find owner names that start with A.",
-                    tip: "Tip: LIKE works with wildcards like %.",
-                    hint: "Use WHERE name LIKE 'A%'.",
-                    schema: "Owners(id, name, city)",
-                    answer: "SELECT name FROM Owners WHERE name LIKE 'A%'",
-                    blocks: ["SELECT", "FROM", "WHERE", "LIKE", "name", "Owners", "'A%'", "'B%'", "city"]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "Nice refinements",
-                    sections: [
-                        InfoSection(
-                            title: "Better questions",
-                            body: "DISTINCT and LIKE help you ask more precise questions."
-                        ),
-                        InfoSection(
-                            title: "What next",
-                            body: "You now have a strong SQL foundation. Try mixing these ideas in practice mode."
-                        )
-                    ]
-                )))
-            ]
-        ),
-        Lesson(
-            title: "L6 Distinct / Like / Limit", subtitle: "Refine results",
-            slides: [
-                Slide(kind: .info(Info(
-                    title: "Refine results",
-                    sections: [
-                        InfoSection(
-                            title: "DISTINCT",
-                            body: "DISTINCT removes duplicate rows from a result set."
-                        ),
-                        InfoSection(
-                            title: "LIKE + LIMIT",
-                            body: "LIKE matches patterns in text. LIMIT restricts how many rows you get."
-                        )
-                    ]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List distinct species from Animals.",
-                    tip: "Tip: DISTINCT goes right after SELECT.",
-                    hint: "SELECT DISTINCT species FROM Animals",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT DISTINCT species FROM Animals",
-                    blocks: ["SELECT", "DISTINCT", "FROM", "species", "Animals", "name"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List the oldest 5 animals by age.",
-                    tip: "Tip: ORDER BY before LIMIT.",
-                    hint: "Use ORDER BY age DESC LIMIT 5",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT name FROM Animals ORDER BY age DESC LIMIT 5",
-                    blocks: ["SELECT", "FROM", "ORDER BY", "LIMIT", "name", "Animals", "age", "DESC", "ASC", "5"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "Find owner names that start with A.",
-                    tip: "Tip: LIKE works with wildcards like %.",
-                    hint: "Use WHERE name LIKE 'A%'.",
-                    schema: "Owners(id, name, city)",
-                    answer: "SELECT name FROM Owners WHERE name LIKE 'A%'",
-                    blocks: ["SELECT", "FROM", "WHERE", "LIKE", "name", "Owners", "'A%'", "'B%'", "city"]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "Nice refinements",
-                    sections: [
-                        InfoSection(
-                            title: "Better questions",
-                            body: "DISTINCT and LIKE help you ask more precise questions."
-                        ),
-                        InfoSection(
-                            title: "What next",
-                            body: "You now have a strong SQL foundation. Try mixing these ideas in practice mode."
-                        )
-                    ]
-                )))
-            ]
-        ),
-        Lesson(
-            title: "L6 Distinct / Like / Limit", subtitle: "Refine results",
-            slides: [
-                Slide(kind: .info(Info(
-                    title: "Refine results",
-                    sections: [
-                        InfoSection(
-                            title: "DISTINCT",
-                            body: "DISTINCT removes duplicate rows from a result set."
-                        ),
-                        InfoSection(
-                            title: "LIKE + LIMIT",
-                            body: "LIKE matches patterns in text. LIMIT restricts how many rows you get."
-                        )
-                    ]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List distinct species from Animals.",
-                    tip: "Tip: DISTINCT goes right after SELECT.",
-                    hint: "SELECT DISTINCT species FROM Animals",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT DISTINCT species FROM Animals",
-                    blocks: ["SELECT", "DISTINCT", "FROM", "species", "Animals", "name"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List the oldest 5 animals by age.",
-                    tip: "Tip: ORDER BY before LIMIT.",
-                    hint: "Use ORDER BY age DESC LIMIT 5",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT name FROM Animals ORDER BY age DESC LIMIT 5",
-                    blocks: ["SELECT", "FROM", "ORDER BY", "LIMIT", "name", "Animals", "age", "DESC", "ASC", "5"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "Find owner names that start with A.",
-                    tip: "Tip: LIKE works with wildcards like %.",
-                    hint: "Use WHERE name LIKE 'A%'.",
-                    schema: "Owners(id, name, city)",
-                    answer: "SELECT name FROM Owners WHERE name LIKE 'A%'",
-                    blocks: ["SELECT", "FROM", "WHERE", "LIKE", "name", "Owners", "'A%'", "'B%'", "city"]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "Nice refinements",
-                    sections: [
-                        InfoSection(
-                            title: "Better questions",
-                            body: "DISTINCT and LIKE help you ask more precise questions."
-                        ),
-                        InfoSection(
-                            title: "What next",
-                            body: "You now have a strong SQL foundation. Try mixing these ideas in practice mode."
-                        )
-                    ]
-                )))
-            ]
-        ),
-        Lesson(
-            title: "L6 Distinct / Like / Limit", subtitle: "Refine results",
-            slides: [
-                Slide(kind: .info(Info(
-                    title: "Refine results",
-                    sections: [
-                        InfoSection(
-                            title: "DISTINCT",
-                            body: "DISTINCT removes duplicate rows from a result set."
-                        ),
-                        InfoSection(
-                            title: "LIKE + LIMIT",
-                            body: "LIKE matches patterns in text. LIMIT restricts how many rows you get."
-                        )
-                    ]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List distinct species from Animals.",
-                    tip: "Tip: DISTINCT goes right after SELECT.",
-                    hint: "SELECT DISTINCT species FROM Animals",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT DISTINCT species FROM Animals",
-                    blocks: ["SELECT", "DISTINCT", "FROM", "species", "Animals", "name"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "List the oldest 5 animals by age.",
-                    tip: "Tip: ORDER BY before LIMIT.",
-                    hint: "Use ORDER BY age DESC LIMIT 5",
-                    schema: "Animals(id, name, species, age)",
-                    answer: "SELECT name FROM Animals ORDER BY age DESC LIMIT 5",
-                    blocks: ["SELECT", "FROM", "ORDER BY", "LIMIT", "name", "Animals", "age", "DESC", "ASC", "5"]
-                ))),
-                Slide(kind: .activity(Activity(
-                    question: "Find owner names that start with A.",
-                    tip: "Tip: LIKE works with wildcards like %.",
-                    hint: "Use WHERE name LIKE 'A%'.",
-                    schema: "Owners(id, name, city)",
-                    answer: "SELECT name FROM Owners WHERE name LIKE 'A%'",
-                    blocks: ["SELECT", "FROM", "WHERE", "LIKE", "name", "Owners", "'A%'", "'B%'", "city"]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "Nice refinements",
-                    sections: [
-                        InfoSection(
-                            title: "Better questions",
-                            body: "DISTINCT and LIKE help you ask more precise questions."
-                        ),
-                        InfoSection(
-                            title: "What next",
-                            body: "You now have a strong SQL foundation. Try mixing these ideas in practice mode."
+                            title: "Practice suggestion",
+                            body: "Redo lessons in text mode and challenge yourself to write each query before using blocks."
                         )
                     ]
                 )))
@@ -547,4 +469,3 @@ extension Lesson {
         )
     ]
 }
-

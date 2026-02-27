@@ -76,18 +76,18 @@ struct ActivityView: View {
                             .padding(.horizontal)
                     }
                     
-                    if let schema = activity.schema {
-                        GroupBox {
-                            Text(schema)
+                    GroupBox {
+                        ForEach(activity.schemas.indices, id: \.self) { index in
+                            Text(activity.schemas[index])
                                 .font(.system(.subheadline, design: .monospaced))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.top, 4)
-                        } label: {
-                            Text("Schema")
-                                .fontWidth(.expanded)
+                                .padding(.vertical)
                         }
-                        .padding(.horizontal)
+                    } label: {
+                        Text("Schema")
+                            .fontWidth(.expanded)
                     }
+                    .padding(.horizontal)
                     
                     HStack {
                         Spacer()
@@ -478,7 +478,7 @@ struct ActivityView: View {
     private func defaultHelpPrompt() -> String {
         var prompt = "You are a SQL tutor. Give hints only; do not provide the full final query.\n"
         prompt += "Question: \(activity.question)\n"
-        if let schema = activity.schema {
+        activity.schemas.forEach { schema in
             prompt += "Schema:\n\(schema)\n"
         }
         let currentAnswer = answerMode == .text
@@ -530,11 +530,14 @@ struct ActivityView: View {
         attemptFeedbackExplanation = ""
         attemptFeedbackNextStep = ""
         
+        let joinedSchemas = activity.schemas.joined(separator: "; ")
+        let joinedAnswers = activity.acceptedAnswers.joined(separator: "; ")
+        
         let prompt = """
         Analyze this SQL learner attempt and provide concise coaching.
         Question: \(activity.question)
-        Schema: \(activity.schema ?? "No schema provided")
-        Expected SQL: \(activity.answer)
+        Schema: \(activity.schemas.isEmpty ? "No schema provided" : joinedSchemas)
+        Expected SQL: \(joinedAnswers)
         User SQL: \(attemptedAnswer)
         """
         
@@ -923,8 +926,10 @@ struct ActivityView: View {
         lastSubmittedAnswer = rawCandidate
         
         let candidateTokens = canonicalSQLTokens(rawCandidate)
-        let expectedTokens = canonicalSQLTokens(activity.answer)
-        let isCorrect = candidateTokens == expectedTokens
+        let allExpectedTokens = activity.acceptedAnswers.map {
+            canonicalSQLTokens($0)
+        }
+        let isCorrect = allExpectedTokens.contains(candidateTokens)
         
         if isCorrect {
             clearAttemptFeedback()

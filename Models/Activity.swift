@@ -12,23 +12,25 @@ struct Activity: Equatable, Identifiable, Hashable {
     let question: String
     let tip: String?
     let hint: String?
-    let schema: String?
-    let answer: String
+    let schemas: [String]
+    let acceptedAnswers: [String]
     let initialBlocks: [Block]
     
     init(
         question: String,
         tip: String? = nil,
-        hint: String?,
-        schema: String? = nil,
-        answer: String,
+        hint: String? = nil,
+        schemas: [String] = [],
+        acceptedAnswers: [String],
         blocks: [String]
     ) {
+        precondition(!acceptedAnswers.isEmpty, "Activity.acceptedAnswers must contain at least one SQL answer.")
+        
         self.question = question
         self.tip = tip
         self.hint = hint
-        self.schema = schema
-        self.answer = answer
-        self.initialBlocks = blocks.map { Block(content: $0) }
+        self.schemas = schemas
+        self.acceptedAnswers = acceptedAnswers
+        self.initialBlocks = blocks.shuffled().map { Block(content: $0) }
     }
 }
