@@ -33,12 +33,15 @@ struct SettingsView: View {
                 }
                 
                 Section("Answers") {
-                    Picker("Default method", selection: $settings.defaultAnswerModeRawValue) {
-                        ForEach(AnswerMode.allCases) { mode in
-                            Text(mode.title).tag(mode.rawValue)
+                    HStack(spacing: 60) {
+                        Text("Default method")
+                        Picker("Default method", selection: $settings.defaultAnswerModeRawValue) {
+                            ForEach(AnswerMode.allCases) { mode in
+                                Text(mode.title).tag(mode.rawValue)
+                            }
                         }
+                        .pickerStyle(.segmented)
                     }
-                    .pickerStyle(.segmented)
                 }
                 
                 Section("About") {
