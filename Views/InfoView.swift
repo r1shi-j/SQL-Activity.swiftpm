@@ -19,7 +19,6 @@ struct InfoView: View {
     }
     
     var body: some View {
-        //        ScrollView {
         VStack(spacing: 16) {
             Text(info.title)
                 .font(.title)
@@ -30,7 +29,7 @@ struct InfoView: View {
                     Text(section.title)
                         .font(.headline)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(section.body)
+                    Text(formattedBody(section.body))
                 }
                 .padding(.horizontal)
                 
@@ -41,7 +40,6 @@ struct InfoView: View {
             
             Spacer(minLength: 24)
         }
-        //        }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 if #available(iOS 26.0, *) {
@@ -65,5 +63,12 @@ struct InfoView: View {
                 }
             }
         }
+    }
+    
+    private func formattedBody(_ text: String) -> AttributedString {
+        if let attributed = try? AttributedString(markdown: text) {
+            return attributed
+        }
+        return AttributedString(text)
     }
 }
