@@ -3,6 +3,8 @@ import SwiftUI
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
     
+    @Namespace private var lessonTransitionNamespace
+    
     @State private var lessons: [Lesson] = Lesson.defaultLessons
     @State private var path = NavigationPath()
     @State private var isShowingSettings = false
@@ -10,7 +12,10 @@ struct HomeView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            LessonMapView(lessons: lessons) { lesson in
+            LessonMapView(
+                lessons: lessons,
+                transitionNamespace: lessonTransitionNamespace
+            ) { lesson in
                 path.append(lesson)
             }
             .navigationDestination(for: Lesson.self) { lesson in
@@ -19,6 +24,7 @@ struct HomeView: View {
                         handleFinish(for: lessons[idx], success: success)
                     }
                     .id(lesson.id)
+                    .navigationTransition(.zoom(sourceID: lesson.id, in: lessonTransitionNamespace))
                 } else {
                     Text("Lesson not found")
                 }

@@ -4,6 +4,7 @@ struct LessonCard: View {
     @Environment(AppSettings.self) private var settings
     
     let lesson: LessonMapView.MapLesson
+    let transitionNamespace: Namespace.ID
     let action: () -> Void
     
     var body: some View {
@@ -25,6 +26,7 @@ struct LessonCard: View {
             )
         }
         .buttonStyle(.plain)
+        .matchedTransitionSource(id: lesson.id, in: transitionNamespace)
         .opacity(lesson.status == .locked ? 0.6 : 1)
         .disabled(lesson.status == .locked)
     }

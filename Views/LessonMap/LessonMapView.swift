@@ -4,6 +4,7 @@ struct LessonMapView: View {
     @Environment(AppSettings.self) private var settings
     
     let lessons: [Lesson]
+    let transitionNamespace: Namespace.ID
     let onSelectLesson: (Lesson) -> Void
     
     struct MapLesson: Identifiable {
@@ -64,7 +65,10 @@ struct LessonMapView: View {
                     
                     VStack(spacing: 36) {
                         ForEach(mapLessons) { lesson in
-                            LessonNodeView(lesson: lesson) {
+                            LessonNodeView(
+                                lesson: lesson,
+                                transitionNamespace: transitionNamespace
+                            ) {
                                 onSelectLesson(lesson.lesson)
                             }
                         }

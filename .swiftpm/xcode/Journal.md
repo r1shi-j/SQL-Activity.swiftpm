@@ -41,6 +41,8 @@ Think of the app like a restaurant:
 
 - Added a first-launch onboarding splash flow with a persisted `hasSeenOnboarding` flag in `AppSettings`, then wired a "Replay intro" button in Settings so demos and judges can revisit the walkthrough anytime. Gotcha: presenting onboarding from Home required a callback from `SettingsView` to avoid coupling settings UI to navigation state.
 
+- Upgraded lesson navigation from default slide push to SwiftUI's built-in zoom navigation transition using `matchedTransitionSource` + `navigationTransition(.zoom)`. The transition now visually links each lesson card to its destination screen, which feels more intentional during demos.
+
 ## Engineer's Wisdom
 - Small models + clear view composition beats giant view controllers.
 - Keep interactions reversible; dragging a block back out should be as easy as adding it.
