@@ -7,19 +7,44 @@ struct OnboardingView: View {
     
     private let pages: [OnboardingPage] = [
         OnboardingPage(
-            title: "Welcome to SQL Activity",
-            subtitle: "Learn SQL by building real queries from simple blocks.",
+            title: "Welcome to Learn SQL",
+            subtitle: "This app teaches SQL by letting you build real queries step by step, like solving mini puzzles.",
             systemImage: "graduationcap.fill"
         ),
         OnboardingPage(
-            title: "Build Queries",
-            subtitle: "Tap or drag blocks into the answer area, then check if your SQL is correct.",
+            title: "What Is SQL?",
+            subtitle: "SQL is the language used to read and manage data in databases. You will learn commands like SELECT, WHERE, ORDER BY, INSERT, UPDATE, and JOIN.",
+            systemImage: "server.rack"
+        ),
+        OnboardingPage(
+            title: "Learn In Small Steps",
+            subtitle: "Lessons mix short teaching slides with activities, so you learn one idea, practice it, then build on it.",
+            systemImage: "list.bullet.rectangle.portrait"
+        ),
+        OnboardingPage(
+            title: "Build Queries With Blocks",
+            subtitle: "Tap a block to move it between areas, or drag any block to place it exactly where you want in your answer.",
             systemImage: "square.grid.3x3.fill"
         ),
         OnboardingPage(
-            title: "Progress Through Lessons",
-            subtitle: "Complete activities to unlock more lessons on the map and strengthen your SQL skills.",
+            title: "Use Hints and Feedback",
+            subtitle: "If you get stuck, open a hint. If your answer is wrong, review feedback and adjust your query like a real SQL debugger.",
+            systemImage: "lightbulb.max.fill"
+        ),
+        OnboardingPage(
+            title: "Meet the AI Analyzer",
+            subtitle: "When an answer is incorrect, the AI analyzer explains likely mistakes, compares your query to expected SQL, and suggests what to fix next.",
+            systemImage: "brain.head.profile"
+        ),
+        OnboardingPage(
+            title: "Progress Through The Map",
+            subtitle: "Complete activities to unlock more lessons, tackle harder schemas, and move from beginner queries to multi-table thinking.",
             systemImage: "map.fill"
+        ),
+        OnboardingPage(
+            title: "Think Like a Data Explorer",
+            subtitle: "Your goal is not just correct answers. Learn to ask clear questions, choose the right SQL tools, and reason about data confidently.",
+            systemImage: "sparkles"
         )
     ]
     
