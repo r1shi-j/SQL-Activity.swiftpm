@@ -12,8 +12,3 @@ struct MyApp: App {
         }
     }
 }
-
-/* TODO: below
- Check data for mistakes
- Redo splash screen data
-*/
