@@ -1,6 +1,6 @@
 //
 //  Activity.swift
-//  SQL Activity
+//  Learn SQL
 //
 //  Created by Rishi Jansari on 13/02/2026.
 //

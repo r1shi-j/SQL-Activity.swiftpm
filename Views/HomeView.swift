@@ -1,3 +1,10 @@
+//
+//  HomeView.swift
+//  Learn SQL
+//
+//  Created by Rishi Jansari on 12/02/2026.
+//
+
 import SwiftUI
 
 struct HomeView: View {

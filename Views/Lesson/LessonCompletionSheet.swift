@@ -1,3 +1,10 @@
+//
+//  LessonCompletionSheet.swift
+//  Learn SQL
+//
+//  Created by Rishi Jansari on 26/02/2026.
+//
+
 import ConfettiSwiftUI
 import SwiftUI
 
@@ -141,4 +148,3 @@ private struct CompletionBadgeAnimationValues {
     var offsetY: CGFloat = 0
     var rotation: Angle = .zero
 }
-

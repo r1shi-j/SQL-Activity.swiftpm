@@ -1,3 +1,10 @@
+//
+//  PathLine.swift
+//  Learn SQL
+//
+//  Created by Rishi Jansari on 26/02/2026.
+//
+
 import SwiftUI
 
 struct PathLine: View {

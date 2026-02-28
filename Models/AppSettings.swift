@@ -1,3 +1,10 @@
+//
+//  AppSettings.swift
+//  Learn SQL
+//
+//  Created by Rishi Jansari on 27/02/2026.
+//
+
 import Foundation
 
 @Observable

@@ -1,6 +1,6 @@
 //
 //  LessonView.swift
-//  SQL Activity
+//  Learn SQL
 //
 //  Created by Rishi Jansari on 12/02/2026.
 //
@@ -207,4 +207,3 @@ struct LessonView: View {
         lesson.isComplete = false
     }
 }
-

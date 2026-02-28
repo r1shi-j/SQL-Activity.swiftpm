@@ -1,3 +1,10 @@
+//
+//  AnswerMode.swift
+//  Learn SQL
+//
+//  Created by Rishi Jansari on 26/02/2026.
+//
+
 import Foundation
 
 enum AnswerMode: String, CaseIterable, Identifiable {

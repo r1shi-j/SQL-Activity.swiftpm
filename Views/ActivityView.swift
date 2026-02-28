@@ -1,6 +1,6 @@
 //
 //  ActivityView.swift
-//  SQL Activity
+//  Learn SQL
 //
 //  Created by Rishi Jansari on 12/02/2026.
 //
@@ -274,7 +274,7 @@ struct ActivityView: View {
                 Label("AI Feedback", systemImage: "sparkles")
                     .font(.headline)
                     .fontWidth(.expanded)
-
+                
                 Text("BETA")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.white)
@@ -556,26 +556,26 @@ struct ActivityView: View {
                 .map { index, schema in "\(index + 1). \(schema)" }
                 .joined(separator: "\n")
         }
-
+        
         let expectedAnswersContext = activity.acceptedAnswers.enumerated()
             .map { index, answer in "\(index + 1). \(answer)" }
             .joined(separator: "\n")
-
+        
         let prompt = """
         Analyze this SQL learner attempt and provide concise coaching.
-
+        
         Activity Question:
         \(activity.question)
-
+        
         Schema:
         \(schemaContext)
-
+        
         Accepted Correct SQL Answers:
         \(expectedAnswersContext)
-
+        
         Learner SQL Attempt:
         \(attemptedAnswer)
-
+        
         IMPORTANT:
         - Compare the learner attempt against the accepted answers.
         - Explain what is wrong in terms of SQL structure, clauses, operators, or values.
@@ -584,7 +584,7 @@ struct ActivityView: View {
         
         Code blocks should be contained within ``
         """
-
+        
         let instructions = "You are a SQL coach for beginners. Be precise, supportive, and concise. Focus on mistakes relative to accepted answers and propose one next fix only."
         let session = LanguageModelSession(model: model, instructions: instructions)
         

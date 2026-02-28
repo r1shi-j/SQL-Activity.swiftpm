@@ -1,6 +1,6 @@
 //
 //  Lesson.swift
-//  SQL Activity
+//  Learn SQL
 //
 //  Created by Rishi Jansari on 12/02/2026.
 //

@@ -1,3 +1,10 @@
+//
+//  OnboardingView.swift
+//  Learn SQL
+//
+//  Created by Rishi Jansari on 27/02/2026.
+//
+
 import SwiftUI
 
 struct OnboardingView: View {

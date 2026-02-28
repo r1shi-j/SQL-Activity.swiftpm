@@ -1,6 +1,6 @@
 //
 //  Colours.swift
-//  SQL Activity
+//  Learn SQL
 //
 //  Created by Rishi Jansari on 26/02/2026.
 //

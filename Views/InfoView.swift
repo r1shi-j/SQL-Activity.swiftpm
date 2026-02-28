@@ -1,6 +1,6 @@
 //
 //  InfoView.swift
-//  SQL Activity
+//  Learn SQL
 //
 //  Created by Rishi Jansari on 12/02/2026.
 //
@@ -24,7 +24,7 @@ struct InfoView: View {
                 Text(info.title)
                     .font(.title)
                     .padding(.vertical)
-
+                
                 ForEach(Array(info.sections.enumerated()), id: \.element.id) { index, section in
                     VStack(alignment: .leading, spacing: 8) {
                         Text(section.title)
@@ -34,7 +34,7 @@ struct InfoView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.vertical)
-
+                    
                     if index != info.sections.indices.last {
                         Divider()
                     }
