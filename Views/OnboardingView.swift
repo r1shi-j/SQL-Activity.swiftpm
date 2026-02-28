@@ -47,11 +47,6 @@ struct OnboardingView: View {
             title: "Progress Through The Map",
             subtitle: "Complete activities to unlock more lessons, tackle harder schemas, and move from beginner queries to multi-table thinking.",
             systemImage: "map.fill"
-        ),
-        OnboardingPage(
-            title: "Think Like a Data Explorer",
-            subtitle: "Your goal is not just correct answers. Learn to ask clear questions, choose the right SQL tools, and reason about data confidently.",
-            systemImage: "sparkles"
         )
     ]
     

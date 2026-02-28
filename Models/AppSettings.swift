@@ -36,14 +36,14 @@ final class AppSettings {
     
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        self.accentColorRawValue = defaults.string(forKey: Keys.accentColor) ?? AccentColorOption.indigo.rawValue
+        self.accentColorRawValue = defaults.string(forKey: Keys.accentColor) ?? AccentColorOption.teal.rawValue
         self.unlockAllLessons = defaults.object(forKey: Keys.unlockAllLessons) as? Bool ?? false
         self.defaultAnswerModeRawValue = defaults.string(forKey: Keys.defaultAnswerMode) ?? AnswerMode.blocks.rawValue
         self.hasSeenOnboarding = defaults.object(forKey: Keys.hasSeenOnboarding) as? Bool ?? false
     }
     
     var accentColorOption: AccentColorOption {
-        AccentColorOption(rawValue: accentColorRawValue) ?? .indigo
+        AccentColorOption(rawValue: accentColorRawValue) ?? .teal
     }
     
     var defaultAnswerMode: AnswerMode {

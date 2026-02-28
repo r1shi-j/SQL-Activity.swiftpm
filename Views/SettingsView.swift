@@ -51,11 +51,15 @@ struct SettingsView: View {
                     }
                 }
                 
-                Section("About") {
-                    Button("Replay intro") {
+                Section {
+                    Button("Replay onboarding") {
                         dismiss()
                         onReplayOnboarding()
                     }
+                } header: {
+                    Text("About")
+                } footer: {
+                    Text("App created by Rishi Jansari")
                 }
             }
             .toolbar {

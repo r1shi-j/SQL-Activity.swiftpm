@@ -10,43 +10,9 @@ import Foundation
 extension Lesson {
     nonisolated(unsafe) static let defaultLessons = [
         Lesson(
-            title: "Welcome to SQL",
-            subtitle: "How this app works",
+            title: "Tables and Query Flow",
+            subtitle: "Read before you write",
             slides: [
-                Slide(kind: .info(Info(
-                    title: "What SQL is and why people use it",
-                    sections: [
-                        InfoSection(
-                            title: "SQL asks questions about data",
-                            body: "SQL stands for Structured Query Language. You use it to ask a database questions like: 'Which animals are older than 2?' or 'How many owners live in London?'"
-                        ),
-                        InfoSection(
-                            title: "Think in tables",
-                            body: "Databases store data in tables. Tables have columns (like name, age, city) and rows (actual records). SQL helps you choose columns, filter rows, sort results, and combine multiple tables."
-                        ),
-                        InfoSection(
-                            title: "The goal of this app",
-                            body: "You will learn SQL by building real queries. The app starts simple, then progressively adds filtering, sorting, grouping, joins, and data changes."
-                        )
-                    ]
-                ))),
-                Slide(kind: .info(Info(
-                    title: "How to solve an activity",
-                    sections: [
-                        InfoSection(
-                            title: "Build your query",
-                            body: "Use blocks to build SQL in the correct order. Tap blocks to move them between areas. Long-press and drag to reorder or move blocks across sections."
-                        ),
-                        InfoSection(
-                            title: "Then submit",
-                            body: "When you submit, your query is checked against valid SQL answers. If it is wrong, use hints and AI Feedback to understand exactly what to fix."
-                        ),
-                        InfoSection(
-                            title: "You can switch modes",
-                            body: "Block mode is great for learning structure. Text mode is great for writing raw SQL once you feel more confident."
-                        )
-                    ]
-                ))),
                 Slide(kind: .info(Info(
                     title: "Syntax and accuracy matter",
                     sections: [
@@ -61,15 +27,13 @@ extension Lesson {
                         InfoSection(
                             title: "Quoted text values",
                             body: "String values use quotes, like `species = 'cat'`. Numbers typically do not use quotes, like `age > 2`."
+                        ),
+                        InfoSection(
+                            title: "Switch between blocks or text",
+                            body: "Block mode is great for learning structure. Text mode is great for writing raw SQL once you feel more confident, but beware it is easier to make mistakes."
                         )
                     ]
-                )))
-            ]
-        ),
-        Lesson(
-            title: "Tables and Query Flow",
-            subtitle: "Read before you write",
-            slides: [
+                ))),
                 Slide(kind: .info(Info(
                     title: "Understand the schema first",
                     sections: [
@@ -189,6 +153,10 @@ extension Lesson {
                         InfoSection(
                             title: "Next concept",
                             body: "Now you will learn to reduce rows with `WHERE` so you only keep relevant records."
+                        ),
+                        InfoSection(
+                            title: "Already know some SQL?",
+                            body: "In the home view, click the settings icon in the top right, you can toggle a setting to unlock all lessons immediately!"
                         )
                     ]
                 )))
@@ -409,7 +377,7 @@ extension Lesson {
         ),
         Lesson(
             title: "Aggregates and HAVING",
-            subtitle: "Learn AVG first, then filter groups",
+            subtitle: "AVG and SUM",
             slides: [
                 Slide(kind: .info(Info(
                     title: "Using AVG with GROUP BY",
