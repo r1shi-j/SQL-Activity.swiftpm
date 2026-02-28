@@ -78,6 +78,5 @@ struct LessonMapView: View {
             }
             .padding(.horizontal, 16)
         }
-        .background(AppTheme.infoBackground.ignoresSafeArea())
     }
 }
