@@ -26,7 +26,7 @@ extension Lesson {
                         ),
                         InfoSection(
                             title: "Quoted text values",
-                            body: "String values use quotes, like `species = 'cat'`. Numbers typically do not use quotes, like `age > 2`."
+                            body: "String values use quotes, like `species = 'cat'`. Numbers typically do not use quotes, like `age > 2`.\nDon't mix and match quotation marks, use either single or double quotes and stick with it throughout your answer."
                         ),
                         InfoSection(
                             title: "Switch between blocks or text",
@@ -218,7 +218,8 @@ extension Lesson {
                         "Animals(id, name, species, age, owner_id)"
                     ],
                     acceptedAnswers: [
-                        "SELECT name FROM Animals WHERE species = 'cat' AND age >= 2"
+                        "SELECT name FROM Animals WHERE species = 'cat' AND age >= 2",
+                        "SELECT name FROM Animals WHERE species = \"cat\" AND age >= 2"
                     ],
                     blocks: ["SELECT", "name", "FROM", "Animals", "WHERE", "species", "=", "'cat'", "AND", "age", ">=", "2", "3", "OR", "*"]
                 ))),
@@ -501,7 +502,9 @@ extension Lesson {
                     ],
                     acceptedAnswers: [
                         "INSERT INTO Owners (name, city) VALUES ('Riley', 'Berlin')",
-                        "INSERT INTO Owners ( name , city ) VALUES ( 'Riley' , 'Berlin' )"
+                        "INSERT INTO Owners (name, city) VALUES (\"Riley\", \"Berlin\")",
+                        "INSERT INTO Owners ( name , city ) VALUES ( 'Riley' , 'Berlin' )",
+                        "INSERT INTO Owners ( name , city ) VALUES ( \"Riley\" , \"Berlin\" )"
                     ],
                     blocks: ["INSERT", "INTO", "Owners", "(", "name", ",", "city", ")", "VALUES", "(", "'Riley'", ",", "'Berlin'", ")", "UPDATE", "SET"]
                 ))),
@@ -513,7 +516,9 @@ extension Lesson {
                     ],
                     acceptedAnswers: [
                         "INSERT INTO Owners (name, city) VALUES ('Luna', 'Madrid')",
-                        "INSERT INTO Owners ( name , city ) VALUES ( 'Luna' , 'Madrid') "
+                        "INSERT INTO Owners (name, city) VALUES (\"Luna\", \"Madrid\")",
+                        "INSERT INTO Owners ( name , city ) VALUES ( 'Luna' , 'Madrid') ",
+                        "INSERT INTO Owners ( name , city ) VALUES ( \"Luna\" , \"Madrid\") "
                     ],
                     blocks: ["INSERT", "INTO", "Owners", "(", "name", ",", "city", ")", "VALUES", "(", "'Luna'", ",", "'Madrid'", ")", "'Riley'", "'Berlin'", "DELETE"]
                 ))),
@@ -560,7 +565,8 @@ extension Lesson {
                         "Owners(id, name, city)"
                     ],
                     acceptedAnswers: [
-                        "UPDATE Owners SET city = 'Paris' WHERE name = 'Riley'"
+                        "UPDATE Owners SET city = 'Paris' WHERE name = 'Riley'",
+                        "UPDATE Owners SET city = \"Paris\" WHERE name = \"Riley\""
                     ],
                     blocks: ["UPDATE", "Owners", "SET", "city", "=", "'Paris'", "WHERE", "name", "=", "'Riley'", "'Berlin'", "DELETE", "FROM", "*"]
                 ))),
@@ -571,7 +577,8 @@ extension Lesson {
                         "Animals(id, name, species, age, owner_id)"
                     ],
                     acceptedAnswers: [
-                        "UPDATE Animals SET age = 4 WHERE species = 'cat'"
+                        "UPDATE Animals SET age = 4 WHERE species = 'cat'",
+                        "UPDATE Animals SET age = 4 WHERE species = \"cat\""
                     ],
                     blocks: ["UPDATE", "Animals", "SET", "age", "=", "4", "WHERE", "species", "=", "'cat'", "'dog'", "3", "INSERT", "INTO"]
                 ))),
@@ -629,7 +636,8 @@ extension Lesson {
                         "Owners(id, name, city)"
                     ],
                     acceptedAnswers: [
-                        "DELETE FROM Owners WHERE city = 'Berlin'"
+                        "DELETE FROM Owners WHERE city = 'Berlin'",
+                        "DELETE FROM Owners WHERE city = \"Berlin\""
                     ],
                     blocks: ["DELETE", "FROM", "Owners", "WHERE", "city", "=", "'Berlin'", "'Paris'", "name", "UPDATE", "SET"]
                 ))),
@@ -736,7 +744,9 @@ extension Lesson {
                     ],
                     acceptedAnswers: [
                         "SELECT name FROM Owners WHERE id IN (SELECT owner_id FROM Animals WHERE species = 'cat')",
-                        "SELECT name FROM Owners WHERE id IN ( SELECT owner_id FROM Animals WHERE species = 'cat' )"
+                        "SELECT name FROM Owners WHERE id IN (SELECT owner_id FROM Animals WHERE species = \"cat\")",
+                        "SELECT name FROM Owners WHERE id IN ( SELECT owner_id FROM Animals WHERE species = 'cat' )",
+                        "SELECT name FROM Owners WHERE id IN ( SELECT owner_id FROM Animals WHERE species = \"cat\" )"
                     ],
                     blocks: ["SELECT", "name", "FROM", "Owners", "WHERE", "id", "IN", "(", "SELECT", "owner_id", "FROM", "Animals", "WHERE", "species", "=", "'cat'", ")", "'dog'", "age", ">", "5"]
                 ))),

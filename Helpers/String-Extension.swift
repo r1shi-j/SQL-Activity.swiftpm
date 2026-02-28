@@ -1,5 +1,5 @@
 //
-//  FormattedString.swift
+//  String-Extension.swift
 //  Learn SQL
 //
 //  Created by Rishi Jansari on 27/02/2026.
@@ -8,6 +8,14 @@
 import Foundation
 
 extension String {
+    func normalizedQuotes() -> String {
+        self
+            .replacingOccurrences(of: "‘", with: "'")
+            .replacingOccurrences(of: "’", with: "'")
+            .replacingOccurrences(of: "“", with: "\"")
+            .replacingOccurrences(of: "”", with: "\"")
+    }
+    
     func formattedBody() -> AttributedString {
         let normalized = self.replacingOccurrences(of: "\r\n", with: "\n")
         

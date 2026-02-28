@@ -330,6 +330,9 @@ struct ActivityView: View {
                         .padding(8)
                         .background(.white.opacity(0.8))
                         .clipShape(.rect(cornerRadius: 12))
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .keyboardType(.asciiCapable)
                     
                     Button {
                         Task { await requestHelp() }
@@ -963,7 +966,7 @@ struct ActivityView: View {
     private func verifyAnswer() {
         let rawCandidate: String
         if answerMode == .text {
-            rawCandidate = textAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
+            rawCandidate = textAnswer.trimmingCharacters(in: .whitespacesAndNewlines).normalizedQuotes()
         } else {
             rawCandidate = formatTokens(usedBlocks.map(\.content))
         }
