@@ -55,15 +55,14 @@ struct SettingsView: View {
                 ToolbarItem(placement: .title) {
                     Text("Settings")
                         .font(.largeTitle)
-                        .fontWidth(.expanded)
                         .fontWeight(.bold)
                         .padding(.top)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
-                        .fontWidth(.expanded)
                 }
             }
         }
+        .fontWidth(.expanded)
     }
 }

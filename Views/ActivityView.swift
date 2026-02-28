@@ -81,7 +81,7 @@ struct ActivityView: View {
                             Text(activity.schemas[index])
                                 .font(.system(.subheadline, design: .monospaced))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.vertical)
+                                .padding(.vertical, 2)
                         }
                     } label: {
                         Text("Schema")
@@ -117,23 +117,27 @@ struct ActivityView: View {
                     
                     Divider()
                     
-                    HStack {
-                        Text("Your Answer")
-                            .font(.headline)
-                            .fontWidth(.expanded)
-                        Spacer()
+                    VStack {
+                        HStack {
+                            Text("Your Answer")
+                                .font(.headline)
+                                .fontWidth(.expanded)
+                            Spacer()
+                        }
+                        .overlay {
+                            answerModePicker
+                                .padding(.bottom)
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 6)
+                        
+                        if answerMode == .blocks {
+                            blocksAnswerSection
+                        } else {
+                            textAnswerSection
+                        }
                     }
-                    .overlay {
-                        answerModePicker
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 6)
-                    
-                    if answerMode == .blocks {
-                        blocksAnswerSection
-                    } else {
-                        textAnswerSection
-                    }
+                    .padding(.vertical)
                     
                     if session.wasCorrect == false {
                         Divider()
@@ -253,8 +257,11 @@ struct ActivityView: View {
                     Text(attemptFeedbackExplanation.formattedBody())
                         .foregroundStyle(.secondary)
                     if !attemptFeedbackNextStep.isEmpty {
-                        Text("Next step: \(attemptFeedbackNextStep.formattedBody())")
-                            .font(.subheadline.weight(.semibold))
+                        (
+                            Text("Next step: ")
+                            + Text(attemptFeedbackNextStep.formattedBody())
+                        )
+                        .font(.subheadline.weight(.semibold))
                     }
                 } else {
                     Text("No feedback yet.")
@@ -351,7 +358,8 @@ struct ActivityView: View {
                         Text("Response")
                             .font(.headline)
                         ScrollView {
-                            Text(helpResponse)
+                            Text(helpResponse.formattedHelpBody())
+                                .multilineTextAlignment(.leading)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .frame(minHeight: 160)
@@ -514,7 +522,7 @@ struct ActivityView: View {
         helpError = nil
         helpResponse = ""
         
-        let instructions = "You are a friendly SQL tutor. Provide hints and reasoning, but do not give the full final query."
+        let instructions = "You are a friendly SQL tutor. Provide hints and reasoning, but do not give the full final query. Keep answers short. Put each bullet on its own line, use \n explicitly for newline, do not use ### ** or ``, there is no markdown formatting."
         let session = LanguageModelSession(model: model, instructions: instructions)
         do {
             let response = try await session.respond(to: helpPrompt)
@@ -573,6 +581,8 @@ struct ActivityView: View {
         - Explain what is wrong in terms of SQL structure, clauses, operators, or values.
         - Give exactly one concrete next edit step.
         - Do not output any full final correct query.
+        
+        Code blocks should be contained within ``
         """
 
         let instructions = "You are a SQL coach for beginners. Be precise, supportive, and concise. Focus on mistakes relative to accepted answers and propose one next fix only."

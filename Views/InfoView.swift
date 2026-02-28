@@ -23,7 +23,7 @@ struct InfoView: View {
             VStack(spacing: 16) {
                 Text(info.title)
                     .font(.title)
-                    .padding(.top)
+                    .padding(.vertical)
 
                 ForEach(Array(info.sections.enumerated()), id: \.element.id) { index, section in
                     VStack(alignment: .leading, spacing: 8) {
@@ -33,16 +33,15 @@ struct InfoView: View {
                         Text(section.body.formattedBody())
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.vertical)
 
                     if index != info.sections.indices.last {
                         Divider()
                     }
                 }
-
-                Spacer(minLength: 24)
             }
             .frame(width: proxy.size.width * (2.0 / 3.0), alignment: .leading)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
