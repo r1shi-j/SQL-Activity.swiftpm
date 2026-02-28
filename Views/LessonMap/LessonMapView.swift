@@ -71,13 +71,14 @@ struct LessonMapView: View {
                     PathLine()
                     
                     VStack(spacing: 36) {
-                        ForEach(mapLessons) { lesson in
+                        ForEach(Array(mapLessons.enumerated()), id: \.element.id) { index, lesson in
                             LessonNodeView(
                                 lesson: lesson,
                                 transitionNamespace: transitionNamespace
                             ) {
                                 onSelectLesson(lesson.lesson)
                             }
+                            .padding(.bottom, index == mapLessons.count - 1 ? 75 : 0)
                         }
                     }
                 }
