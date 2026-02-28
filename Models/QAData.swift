@@ -219,7 +219,9 @@ extension Lesson {
                     ],
                     acceptedAnswers: [
                         "SELECT name FROM Animals WHERE species = 'cat' AND age >= 2",
-                        "SELECT name FROM Animals WHERE species = \"cat\" AND age >= 2"
+                        "SELECT name FROM Animals WHERE species = \"cat\" AND age >= 2",
+                        "SELECT name FROM Animals WHERE age >= 2 AND species = 'cat'",
+                        "SELECT name FROM Animals WHERE age >= 2 AND species = \"cat\""
                     ],
                     blocks: ["SELECT", "name", "FROM", "Animals", "WHERE", "species", "=", "'cat'", "AND", "age", ">=", "2", "3", "OR", "*"]
                 ))),
